@@ -1,6 +1,6 @@
-const bcrypt = require("bcryptjs");
-const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
+import bcrypt from "bcryptjs";
+import User from "../models/userModel.js";
+import jwt from "jsonwebtoken";
 
 const generateToken = (user) => {
   return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -8,7 +8,7 @@ const generateToken = (user) => {
   });
 };
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
 
@@ -60,7 +60,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -110,7 +110,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
   try {
     res.clearCookie("SportsBuddyToken", {
       httpOnly: true,

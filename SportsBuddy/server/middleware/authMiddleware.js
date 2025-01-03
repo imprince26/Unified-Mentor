@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
 
-module.exports.isAuthenticated = async (req, res, next) => {
+export const isAuthenticated = async (req, res, next) => {
   try {
     const token = req.cookies.SportsBuddyToken;
 
@@ -48,7 +48,7 @@ module.exports.isAuthenticated = async (req, res, next) => {
   }
 };
 
-module.exports.isAdmin = async (req, res, next) => {
+export const isAdmin = async (req, res, next) => {
   try {
     if (!req.user) {
       return res.status(401).json({

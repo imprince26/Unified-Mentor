@@ -1,14 +1,7 @@
-const express = require("express");
-const app = express();
-const router = express.Router();
-const { isAuthenticated, isAdmin } = require("../middleware/authMiddleware");
-const {
-  getAllEvents,
-  getEventById,
-  updateEvent,
-  createEvent,
-  deleteEvent,
-} = require("../controllers/eventController");
+import { Router } from "express";
+const router = Router();
+import { isAuthenticated, isAdmin } from "../middleware/authMiddleware.js";
+import { getAllEvents, getEventById, updateEvent, createEvent, deleteEvent } from "../controllers/eventController.js";
 
 router.get("/", getAllEvents);
 router.get("/:id", getEventById);
@@ -16,4 +9,4 @@ router.post("/", isAuthenticated, isAdmin, createEvent);
 router.put("/:id", isAuthenticated, isAdmin, updateEvent);
 router.delete("/:id", isAuthenticated, isAdmin, deleteEvent);
 
-module.exports = router;
+export default router;
