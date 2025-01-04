@@ -13,7 +13,7 @@ import authRoute from "./routes/authRoute.js";
 import eventRoute from "./routes/eventRoute.js";
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin:process.env.CLIENT_URL,
   credentials: true
 }));
 app.use(express.json());
