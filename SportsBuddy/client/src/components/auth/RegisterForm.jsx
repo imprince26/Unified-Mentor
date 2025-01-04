@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-// Comprehensive Zod Validation Schema
 const registerSchema = z.object({
   name: z
     .string()
@@ -44,7 +43,7 @@ const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
+    .min(6, "Password must be at least 6 characters")
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
       "Password must include uppercase, lowercase, number, and special character"
@@ -75,7 +74,6 @@ const RegisterForm = () => {
     setIsLoading(true);
     try {
       const response = await api.post("/auth/register", data);
-        console.log(response.data);
       toast.success("Registration Successful!", {
         style: {
           background: "#0F2C2C",
@@ -91,7 +89,6 @@ const RegisterForm = () => {
       navigate("/");
     } catch (error) {
       const errorMessage = handleApiError(error);
-    console.log(errorMessage);
       toast.error(errorMessage.message, {
         style: {
           background: "#2C3E50",
@@ -139,9 +136,7 @@ const RegisterForm = () => {
               <FormItem>
                 <FormLabel
                   className={`text-[#B0BEC5] transition-all duration-300 
-                      ${
-                        inputStates.name.isFocused ? "text-[#4CAF50]" : ""
-                      }`}
+                      ${inputStates.name.isFocused ? "text-[#4CAF50]" : ""}`}
                 >
                   Full Name
                 </FormLabel>
