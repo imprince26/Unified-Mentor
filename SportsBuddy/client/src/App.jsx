@@ -49,7 +49,7 @@ function App() {
       <Route
         path="/events/create"
         element={
-          <ProtectedRoute adminOnly>
+          <ProtectedRoute >
             <EventCreate />
           </ProtectedRoute>
         }

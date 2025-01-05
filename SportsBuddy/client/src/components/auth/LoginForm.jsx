@@ -17,13 +17,14 @@ import * as z from "zod";
 import api, { handleApiError } from "@/utils/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
 
-// Zod Validation Schema
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 const LoginForm = () => {
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [inputStates, setInputStates] = useState({
@@ -51,31 +52,11 @@ const LoginForm = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await api.post("/auth/login", data);
-
-      toast.success("Welcome to Your Sports Journey!", {
-        style: {
-          background: "#0F2C2C",
-          color: "#E0F2F1",
-          border: "1px solid #1D4E4E",
-        },
-        iconTheme: {
-          primary: "#2E7D32",
-          secondary: "#E0F2F1",
-        },
-      });
-
-      navigate("/");
+      const response = await login(data);
     } catch (error) {
       const errorMessage = handleApiError(error);
-
-      toast.error(errorMessage.message, {
-        style: {
-          background: "#2C3E50",
-          color: "#ECF0F1",
-        },
-      });
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };

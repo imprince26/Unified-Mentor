@@ -130,7 +130,7 @@ export const logout = (req, res) => {
     });
   }
 };
-// In authController.js
+
 export const getCurrentUser = async (req, res) => {
   try {
     if (!req.user) {

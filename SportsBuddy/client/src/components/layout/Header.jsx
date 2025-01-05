@@ -41,6 +41,7 @@ const NavLink = ({ to, children, icon: Icon, onClick }) => {
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesk, setIsDesk] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -110,7 +111,7 @@ const Header = () => {
                   <Button
                     onClick={() => navigate("/register")}
                     variant="outline"
-                    className="border-[#4CAF50] text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
+                    className="border-[#4CAF50] bg-transparent text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
                   >
                     Register
                   </Button>
@@ -124,7 +125,7 @@ const Header = () => {
                   </div>
                   <Button
                     variant="ghost"
-                    className="text-[#FF5252] hover:text-[#FF5252]/80"
+                    className="text-[#FF5252] hover:bg-[#FF5252]/10 hover:text-[#FF5252]/80"
                     onClick={handleLogout}
                   >
                     <LogOutIcon className="h-5 w-5" />
@@ -133,13 +134,14 @@ const Header = () => {
                 </div>
               )
             ) : (
-              <Button
-                className="md:hidden bg-transparent text-white hover:bg-[#388E3C]"
-                onClick={toggleMobileMenu}
-              >
-                <MenuIcon className="h-6 w-6 text-[#E0F2F1]" />
-              </Button>
+              <div className="hidden"></div>
             )}
+            <Button
+              className="md:hidden   bg-[#4CAF50] text-white hover:bg-[#388E3C]"
+              onClick={toggleMobileMenu}
+            >
+              <MenuIcon className="h-6 w-6 text-[#E0F2F1]" />
+            </Button>
           </div>
         </div>
       </header>
@@ -173,8 +175,12 @@ const Header = () => {
                     {user ? user.name : "Guest"}
                   </span>
                 </div>
-                <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
-                  <XIcon className="h-6 w-6 text-[#FF5252]" />
+                <Button
+                  variant="ghost"
+                  className="hover:bg-[#FF5252]/10"
+                  onClick={toggleMobileMenu}
+                >
+                  <XIcon className=" text-[#FF5252]" />
                 </Button>
               </div>
 
@@ -192,8 +198,7 @@ const Header = () => {
                   Events
                 </NavLink>
 
-                {/* Admin-specific links */}
-                {user && user.role === "admin" && (
+                {user && (
                   <NavLink
                     to="/events/create"
                     icon={PlusCircleIcon}
@@ -208,7 +213,7 @@ const Header = () => {
                   // Logged in user options
                   <Button
                     variant="ghost"
-                    className="justify-start text-[#FF5252] hover:text-[#FF5252]/80 px-4 py-2 w-full"
+                    className="justify-start text-[#FF5252] hover:bg-[#FF5252]/10 hover:text-[#FF5252]/80 px-4 py-2 w-full"
                     onClick={handleLogout}
                   >
                     <LogOutIcon className="mr-2 h-4 w-4" />
@@ -219,7 +224,7 @@ const Header = () => {
                   <div className="space-y-2">
                     <Button
                       variant="outline"
-                      className="w-full border-[#4CAF50] text-[#4CAF50] hover:bg-[#4CAF50]/10"
+                      className="w-full bg-transparent border-[#4CAF50] text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
                       onClick={() => {
                         navigate("/login");
                         toggleMobileMenu();

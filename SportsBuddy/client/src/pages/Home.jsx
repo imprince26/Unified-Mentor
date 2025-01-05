@@ -12,7 +12,6 @@ import CallToAction from "@/components/home/CallToAction";
 
 // Icons
 import {
-  RocketIcon,
   CalendarIcon,
   UsersIcon,
   ActivityIcon,
@@ -99,7 +98,7 @@ const Home = () => {
               <h3 className="text-xl font-semibold mb-4">Explore Events</h3>
               <Button
                 onClick={() => navigate("/events")}
-                className="w-full bg-[#4CAF50] hover:bg-[#388E3C]"
+                className="w-full border bg-transparent border-[#4CAF50] text-[#4CAF50] hover:text-[#388E3C] hover:bg-[#4CAF50]/10"
               >
                 View All Events
               </Button>
@@ -115,7 +114,7 @@ const Home = () => {
               <Button
                 onClick={() => navigate("/register")}
                 variant="outline"
-                className="w-full border-[#4CAF50] text-[#4CAF50] hover:text-[#388E3C] hover:bg-[#4CAF50]/10"
+                className="w-full bg-transparent border-[#4CAF50] text-[#4CAF50] hover:text-[#388E3C] hover:bg-[#4CAF50]/10"
               >
                 Sign Up
               </Button>
@@ -130,7 +129,7 @@ const Home = () => {
               <h3 className="text-xl font-semibold mb-4">Create Event</h3>
               <Button
                 onClick={() => navigate("/events/create")}
-                className="w-full bg-[#4CAF50] hover:bg-[#388E3C]"
+                className="w-full border bg-transparent border-[#4CAF50] text-[#4CAF50] hover:text-[#388E3C] hover:bg-[#4CAF50]/10"
               >
                 Start New Event
               </Button>

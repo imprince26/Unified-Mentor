@@ -78,21 +78,19 @@ export const EventProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
+  const contextValue = {
+    events,
+    selectedEvent,
+    loading,
+    fetchEvents,
+    createEvent,
+    updateEvent,
+    deleteEvent,
+    getEventById,
+    setSelectedEvent,
+  };
   return (
-    <EventContext.Provider
-      value={{
-        events,
-        selectedEvent,
-        loading,
-        fetchEvents,
-        createEvent,
-        updateEvent,
-        deleteEvent,
-        getEventById,
-        setSelectedEvent,
-      }}
-    >
+    <EventContext.Provider value={contextValue}>
       {children}
     </EventContext.Provider>
   );

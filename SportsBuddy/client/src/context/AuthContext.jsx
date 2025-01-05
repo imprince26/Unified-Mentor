@@ -23,14 +23,17 @@ export const AuthProvider = ({ children }) => {
     checkUserAuthentication();
   }, []);
 
-  const checkUserAuthentication = async () => {
+  const checkUserAuthentication = async (next) => {
     try {
       const response = await api.get("/auth/me");
       setUser(response.data.data);
+      console.log(response.data.data);
       setIsAuthenticated(true);
     } catch (error) {
       setUser(null);
+      console.log(error);
       setIsAuthenticated(false);
+      next && next();
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       setIsAuthenticated(true);
 
-      toast.success("Login Successful!", {
+      toast.success("Welcome to Your Sports Journey!", {
         style: {
           background: "#0F2C2C",
           color: "#E0F2F1",
