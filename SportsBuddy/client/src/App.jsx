@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="text-center w-full h-full text-2xl">Loading...</div>;
   }
 
   if (!isAuthenticated) {
@@ -34,16 +34,9 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-
+      <Route path="/" element={<Home />} />
       {/* Protected Routes */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
+
       <Route
         path="/events"
         element={
