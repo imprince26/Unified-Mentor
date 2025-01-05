@@ -32,11 +32,18 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      {/* Protected Routes */}
 
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/events"
         element={
@@ -49,7 +56,7 @@ function App() {
       <Route
         path="/events/create"
         element={
-          <ProtectedRoute >
+          <ProtectedRoute>
             <EventCreate />
           </ProtectedRoute>
         }
