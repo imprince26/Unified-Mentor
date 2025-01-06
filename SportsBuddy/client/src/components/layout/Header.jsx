@@ -100,24 +100,8 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               user.role === "guest" ? (
-                // Show Login and Register for guest users
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => navigate("/login")}
-                    className="bg-[#4CAF50] text-white hover:bg-[#388E3C]"
-                  >
-                    Login
-                  </Button>
-                  <Button
-                    onClick={() => navigate("/register")}
-                    variant="outline"
-                    className="border-[#4CAF50] bg-transparent text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
-                  >
-                    Register
-                  </Button>
-                </div>
+                <div className="hidden"></div>
               ) : (
-                // Show user info and logout for authenticated users
                 <div className="hidden md:flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <UserIcon className="h-5 w-5 text-[#4CAF50]" />
@@ -134,7 +118,22 @@ const Header = () => {
                 </div>
               )
             ) : (
-              <div className="hidden"></div>
+              <div className="flex space-x-2">
+              <Button
+                onClick={() => navigate("/login")}
+                className="bg-[#4CAF50] text-white hover:bg-[#388E3C]"
+              >
+                Login
+              </Button>
+              <Button
+                onClick={() => navigate("/register")}
+                variant="outline"
+                className="border-[#4CAF50] bg-transparent text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
+              >
+                Register
+              </Button>
+            </div>
+             
             )}
             <Button
               className="md:hidden   bg-[#4CAF50] text-white hover:bg-[#388E3C]"
@@ -150,7 +149,7 @@ const Header = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Overlay */}
+           
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
@@ -208,9 +207,9 @@ const Header = () => {
                   </NavLink>
                 )}
 
-                {/* Authentication Actions */}
+              
                 {user ? (
-                  // Logged in user options
+                  
                   <Button
                     variant="ghost"
                     className="justify-start text-[#FF5252] hover:bg-[#FF5252]/10 hover:text-[#FF5252]/80 px-4 py-2 w-full"
@@ -220,7 +219,7 @@ const Header = () => {
                     Logout
                   </Button>
                 ) : (
-                  // Guest/Not logged in options
+                 
                   <div className="space-y-2">
                     <Button
                       variant="outline"
