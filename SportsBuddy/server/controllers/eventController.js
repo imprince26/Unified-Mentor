@@ -43,7 +43,10 @@ export const getEventById = async (req, res) => {
 
 export const createEvent = async (req, res) => {
   try {
-    const newEvent = await Event.create(req.body);
+    const newEvent = await Event.create({
+      ...req.body,
+      createdBy: req.user._id  // Add the current user as the event creator
+    });
 
     res.status(201).json({
       success: true,
@@ -61,18 +64,31 @@ export const createEvent = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   try {
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const event = await Event.findById(req.params.id);
 
-    if (!updatedEvent) {
+    if (!event) {
       return res.status(404).json({
         success: false,
         message: "Event not found",
       });
     }
+
+    // Check if the current user is the event creator or an admin
+    if (
+      event.createdBy.toString() !== req.user._id.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this event",
+      });
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
 
     res.status(200).json({
       success: true,

@@ -82,13 +82,6 @@ const CallToAction = () => {
                 size={20}
               />
             </Button>
-
-            <div className="flex items-center gap-3">
-              <UsersIcon className="text-[#81C784]" size={32} />
-              <span className="text-[#B2DFDB] text-lg">
-                Join 10,000+ Active Athletes
-              </span>
-            </div>
           </motion.div>
 
           {/* Feature Highlights */}

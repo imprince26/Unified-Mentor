@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -15,12 +16,12 @@ import {
   ClockIcon,
   TagIcon,
   TrophyIcon,
-  DollarSignIcon,
+  IndianRupee ,
   UserCheckIcon,
 } from "lucide-react";
 import { formatDate, formatTime, formatCurrency } from "@/utils/formatters";
 import { toast } from "react-hot-toast";
-
+import SportsBuddyLoader from "../layout/Loader";
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,7 +36,6 @@ const EventDetails = () => {
         const fetchedEvent = await getEventById(id);
         setEvent(fetchedEvent);
       } catch (error) {
-        toast.error("Failed to fetch event details");
         navigate("/events");
       } finally {
         setLoading(false);
@@ -47,28 +47,48 @@ const EventDetails = () => {
 
   const handleDeleteEvent = async () => {
     if (user?.role !== "admin") {
-      toast.error("Only admins can delete events");
+      toast.error("Only admins can delete events", {
+        style: {
+          background: "#2C3E50",
+          color: "#ECF0F1",
+        },
+      });
       return;
     }
 
     try {
       await deleteEvent(id);
-      toast.success("Event deleted successfully");
+      toast.success("Event deleted successfully", {
+        style: {
+          background: "#0F2C2C",
+          color: "#E0F2F1",
+        },
+      });
       navigate("/events");
     } catch (error) {
-      toast.error("Failed to delete event");
+      toast.error("Failed to delete event", {
+        style: {
+          background: "#2C3E50",
+          color: "#ECF0F1",
+        },
+      });
     }
   };
 
   const handleEditEvent = () => {
     if (user?.role !== "admin") {
-      toast.error("Only admins can edit events");
+      toast.error("Only admins can edit events", {
+        style: {
+          background: "#2C3E50",
+          color: "#ECF0F1",
+        },
+      });
       return;
     }
     navigate(`/events/edit/${id}`);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <SportsBuddyLoader />;
   if (!event) return <div>Event not found</div>;
 
   // Difficulty level color mapping
@@ -148,7 +168,7 @@ const EventDetails = () => {
               </div>
 
               <div className="flex items-center space-x-4">
-                <DollarSignIcon className="text-[#4CAF50]" size={24} />
+                <IndianRupee  className="text-[#4CAF50]" size={24} />
                 <div>
                   <p className="text-[#81C784]">Registration Fee</p>
                   <p className="font-semibold">
@@ -195,6 +215,7 @@ const EventDetails = () => {
               </Button>
             </div>
           )}
+          
         </div>
       </motion.div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
 import { useAuth } from "@/context/AuthContext";
@@ -23,10 +23,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // Icons
 import {
+  PlusIcon,
   SearchIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  FrownIcon
 } from "lucide-react";
 
 const EventSkeleton = () => (
@@ -34,24 +34,6 @@ const EventSkeleton = () => (
     <Skeleton className="h-6 w-3/4 bg-[#1D4E4E]" />
     <Skeleton className="h-4 w-full bg-[#1D4E4E]" />
     <Skeleton className="h-4 w-1/2 bg-[#1D4E4E]" />
-  </div>
-);
-
-const NoEventsFound = ({ resetFilters }) => (
-  <div className="col-span-full text-center py-16 bg-[#0F2C2C]/50 rounded-xl">
-    <FrownIcon className="mx-auto mb-4 text-[#4CAF50] w-16 h-16" />
-    <h2 className="text-2xl font-bold text-[#81C784] mb-4">
-      No Events Found
-    </h2>
-    <p className="text-[#B0BEC5] mb-6">
-      We couldn't find any events matching your current filters.
-    </p>
-    <Button 
-      onClick={resetFilters}
-      className="bg-[#4CAF50] text-white hover:bg-[#388E3C]"
-    >
-      Reset Filters
-    </Button>
   </div>
 );
 
@@ -86,14 +68,6 @@ const Events = () => {
   ];
 
   const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
-
-  // Reset Filters Function
-  const resetFilters = () => {
-    setSearchTerm("");
-    setCategoryFilter("ALL_CATEGORIES");
-    setDifficultyFilter("ALL_LEVELS");
-    setCurrentPage(1);
-  };
 
   // Filtered and Memoized Events
   const filteredEvents = useMemo(() => {
@@ -156,7 +130,7 @@ const Events = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold text-[#4CAF50] mb-4">
+          <h1 className="text-5xl mt-4 font-bold text-[#4CAF50] mb-4">
             Sports Events
           </h1>
           <p className="text-xl text-[#81C784] max-w-2xl mx-auto">
@@ -184,10 +158,7 @@ const Events = () => {
 
           {/* Category Filter */}
           <div>
-            <Select 
-              value={categoryFilter} 
-              onValueChange={setCategoryFilter}
-            >
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
                 <SelectValue placeholder="Select Category">
                   {categoryFilter === "ALL_CATEGORIES"
@@ -201,7 +172,7 @@ const Events = () => {
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
-                ))} ```jsx
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -233,34 +204,47 @@ const Events = () => {
 
         {/* Events List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading
-            ? Array.from({ length: eventsPerPage }).map((_, index) => (
-                <EventSkeleton key={index} />
-              ))
-            : currentEvents.length > 0
-            ? currentEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))
-            : <NoEventsFound resetFilters={resetFilters} />}
+          {loading ? (
+            Array.from({ length: eventsPerPage }).map((_, index) => (
+              <EventSkeleton key={index} />
+            ))
+          ) : currentEvents.length === 0 ? (
+            <div className="text-center h-20 w-[100vw] text-[#81C784]">
+              
+              <p className="text-2xl font-semibold">No events found.</p>
+            </div>
+          ) : (
+            currentEvents.map((event) => (
+              <EventCard key={event._id} event={event} />
+            ))
+          )}
         </div>
 
         {/* Pagination Controls */}
         <div className="flex justify-between mt-8">
-          <Button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="bg-[#4CAF50] text-white"
-          >
+          <Button onClick={handlePrevPage} disabled={currentPage === 1} className="bg-[#4CAF50] hover:bg-[#2E7D32]">
             <ChevronLeftIcon className="mr-2" /> Previous
           </Button>
           <Button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="bg-[#4CAF50] text-white"
+            className="bg-[#4CAF50] hover:bg-[#2E7D32]"
           >
-            Next <ChevronRightIcon className="ml-2" />
+            Next <ChevronRightIcon className="ml-2 " />
           </Button>
         </div>
+
+        {/* Add Event Button */}
+        {user && (
+          <div className="fixed bottom-4 right-4">
+            <Button
+              onClick={() => navigate("/events/create")}
+              className="bg-[#4CAF50] hover:bg-[#2E7D32]"
+            >
+              <PlusIcon className="mr-2" /> Add Event
+            </Button>
+          </div>
+        )}
       </motion.div>
 
       <Footer />

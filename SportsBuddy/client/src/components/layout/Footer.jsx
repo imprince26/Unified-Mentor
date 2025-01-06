@@ -47,6 +47,15 @@ const Footer = () => {
         <p className="text-sm">
           © {currentYear} Sports Buddy. All rights reserved.
         </p>
+        <p>
+          Designed and Developed by{" "}
+          <a
+            href="https://github.com/imprince26"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#4CAF50] hover:text-[#81C784]"
+            >Prince Patel</a>
+        </p>
       </div>
     </footer>
   );

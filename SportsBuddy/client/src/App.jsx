@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -9,13 +10,15 @@ import Home from "./pages/Home";
 import Events from "./pages/Events";
 import EventCreate from "./pages/EventCreate";
 import EventDetails from "./components/events/EventDetails";
+import EventEdit from "./pages/EventEdit";
+import SportsBuddyLoader from "./components/layout/Loader";
+import NotFound from "./pages/NotFound";
 
-// Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="text-center w-full h-full text-2xl">Loading...</div>;
+    return <SportsBuddyLoader />;
   }
 
   if (!isAuthenticated) {
@@ -54,6 +57,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/events/edit/:id"
+        element={
+          <ProtectedRoute>
+            <EventEdit />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/events/:id"
@@ -65,7 +76,7 @@ function App() {
       />
 
       {/* 404 Route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

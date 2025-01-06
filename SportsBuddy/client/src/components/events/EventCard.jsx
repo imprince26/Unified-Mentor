@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";

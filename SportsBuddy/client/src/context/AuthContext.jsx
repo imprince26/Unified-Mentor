@@ -27,13 +27,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.get("/auth/me");
       setUser(response.data.data);
-      console.log(response.data.data);
       setIsAuthenticated(true);
     } catch (error) {
       setUser(null);
       console.log(error);
       setIsAuthenticated(false);
-      next && next();
+      next();
     } finally {
       setIsLoading(false);
     }

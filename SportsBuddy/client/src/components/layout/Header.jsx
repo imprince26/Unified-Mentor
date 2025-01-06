@@ -1,4 +1,3 @@
-// src/components/layout/Header.jsx
 import React, { useState } from "react";
 import {
   MenuIcon,
@@ -41,7 +40,6 @@ const NavLink = ({ to, children, icon: Icon, onClick }) => {
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDesk, setIsDesk] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -91,9 +89,6 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-6">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/events">Events</NavLink>
-            {user?.role === "admin" && (
-              <NavLink to="/events/create">Create Event</NavLink>
-            )}
           </nav>
 
           {/* User Actions */}
@@ -119,21 +114,20 @@ const Header = () => {
               )
             ) : (
               <div className="flex space-x-2">
-              <Button
-                onClick={() => navigate("/login")}
-                className="bg-[#4CAF50] text-white hover:bg-[#388E3C]"
-              >
-                Login
-              </Button>
-              <Button
-                onClick={() => navigate("/register")}
-                variant="outline"
-                className="border-[#4CAF50] bg-transparent text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
-              >
-                Register
-              </Button>
-            </div>
-             
+                <Button
+                  onClick={() => navigate("/login")}
+                  className="bg-[#4CAF50] text-white hover:bg-[#388E3C]"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => navigate("/register")}
+                  variant="outline"
+                  className="border-[#4CAF50] bg-transparent text-[#4CAF50] hover:text-[#4CAF50]/80 hover:bg-[#4CAF50]/10"
+                >
+                  Register
+                </Button>
+              </div>
             )}
             <Button
               className="md:hidden   bg-[#4CAF50] text-white hover:bg-[#388E3C]"
@@ -149,7 +143,6 @@ const Header = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-           
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
@@ -207,9 +200,7 @@ const Header = () => {
                   </NavLink>
                 )}
 
-              
                 {user ? (
-                  
                   <Button
                     variant="ghost"
                     className="justify-start text-[#FF5252] hover:bg-[#FF5252]/10 hover:text-[#FF5252]/80 px-4 py-2 w-full"
@@ -219,7 +210,6 @@ const Header = () => {
                     Logout
                   </Button>
                 ) : (
-                 
                   <div className="space-y-2">
                     <Button
                       variant="outline"
