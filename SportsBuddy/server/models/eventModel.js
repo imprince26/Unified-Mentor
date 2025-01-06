@@ -88,7 +88,7 @@ const eventSchema = new mongoose.Schema(
       type: Number,
       default: 10,
       min: [1, "Minimum participants must be 1"],
-      max: [100, "Maximum participants cannot exceed 100"],
+      max: [1000, "Maximum participants cannot exceed 100"],
     },
 
     difficulty: {

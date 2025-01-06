@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
 import { useAuth } from "@/context/AuthContext";
@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 // Component Imports
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import CreateEventForm from "@/components/events/CreateEventForm";
+import EventCard from "@/components/events/EventCard";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -19,22 +19,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Icons
 import {
-  PlusIcon,
   SearchIcon,
-  CalendarIcon,
-  TrophyIcon,
-  FilterIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  FrownIcon
 } from "lucide-react";
 
-// Skeleton for loading state
 const EventSkeleton = () => (
-  <div className="bg-[#0F2C2C]/50 rounded-lg animate-pulse p-6">
-    <div className="h-6 bg-[#1D4E4E] mb-4 w-3/4"></div>
-    <div className="h-4 bg-[#1D4E4E] mb-2 w-full"></div>
-    <div className="h-4 bg-[#1D4E4E] mb-2 w-1/2"></div>
+  <div className="bg-[#0F2C2C]/50 rounded-lg p-6 space-y-4">
+    <Skeleton className="h-6 w-3/4 bg-[#1D4E4E]" />
+    <Skeleton className="h-4 w-full bg-[#1D4E4E]" />
+    <Skeleton className="h-4 w-1/2 bg-[#1D4E4E]" />
+  </div>
+);
+
+const NoEventsFound = ({ resetFilters }) => (
+  <div className="col-span-full text-center py-16 bg-[#0F2C2C]/50 rounded-xl">
+    <FrownIcon className="mx-auto mb-4 text-[#4CAF50] w-16 h-16" />
+    <h2 className="text-2xl font-bold text-[#81C784] mb-4">
+      No Events Found
+    </h2>
+    <p className="text-[#B0BEC5] mb-6">
+      We couldn't find any events matching your current filters.
+    </p>
+    <Button 
+      onClick={resetFilters}
+      className="bg-[#4CAF50] text-white hover:bg-[#388E3C]"
+    >
+      Reset Filters
+    </Button>
   </div>
 );
 
@@ -44,10 +61,11 @@ const Events = () => {
   const { user } = useAuth();
 
   // State Management
-  const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL_CATEGORIES");
   const [difficultyFilter, setDifficultyFilter] = useState("ALL_LEVELS");
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 6;
 
   // Fetch events on component mount
   useEffect(() => {
@@ -69,17 +87,28 @@ const Events = () => {
 
   const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
 
+  // Reset Filters Function
+  const resetFilters = () => {
+    setSearchTerm("");
+    setCategoryFilter("ALL_CATEGORIES");
+    setDifficultyFilter("ALL_LEVELS");
+    setCurrentPage(1);
+  };
+
   // Filtered and Memoized Events
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
+      // Search filter
       const matchesSearch = event.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
+      // Category filter
       const matchesCategory =
         categoryFilter === "ALL_CATEGORIES" ||
         event.category === categoryFilter;
 
+      // Difficulty filter
       const matchesDifficulty =
         difficultyFilter === "ALL_LEVELS" ||
         event.difficulty === difficultyFilter;
@@ -88,56 +117,32 @@ const Events = () => {
     });
   }, [events, searchTerm, categoryFilter, difficultyFilter]);
 
-  // Animation Variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  // Event Card Component
-  const EventCard = ({ event }) => (
-    <motion.div
-      variants={itemVariants}
-      className="bg-[#0F2C2C]/70 rounded-lg shadow-lg p-6 cursor-pointer hover:scale-105 transition-transform"
-      onClick={() => navigate(`/events/${event._id}`)}
-    >
-      <h2 className="text-2xl font-bold text-[#4CAF50] mb-2">{event.name}</h2>
-      <p className="text-[#B2DFDB] mb-4 line-clamp-2">{event.description}</p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <CalendarIcon className="text-[#4CAF50]" size={18} />
-          <span className="text-[#81C784]">
-            {new Date(event.date).toLocaleDateString()}
-          </span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <TrophyIcon className="text-[#4CAF50]" size={18} />
-          <span className="text-[#81C784]">{event.difficulty}</span>
-        </div>
-      </div>
-    </motion.div>
+  // Pagination Logic
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredEvents.slice(
+    indexOfFirstEvent,
+    indexOfLastEvent
   );
 
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+
+  // Pagination Handlers
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter, difficultyFilter]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A1A1A] via-[#0F2C2C] to-[#0A1A1A] text-[#E0F2F1]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0A1A1A] via-[#0F2C2C] to-[#0A1A1A] text-[#E0F2F1] relative">
       <Header />
 
       <motion.div
@@ -164,7 +169,7 @@ const Events = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12 grid md:grid-cols-3 gap-6"
+          className="mb-12 grid md:grid-cols-3 gap-6 items-center"
         >
           {/* Search Input */}
           <div className="relative">
@@ -179,7 +184,10 @@ const Events = () => {
 
           {/* Category Filter */}
           <div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select 
+              value={categoryFilter} 
+              onValueChange={setCategoryFilter}
+            >
               <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
                 <SelectValue placeholder="Select Category">
                   {categoryFilter === "ALL_CATEGORIES"
@@ -193,7 +201,7 @@ const Events = () => {
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
-                ))}
+                ))} ```jsx
               </SelectContent>
             </Select>
           </div>
@@ -223,50 +231,37 @@ const Events = () => {
           </div>
         </motion.div>
 
-        {/* Create Event Button */}
-        {user && (
-          <div className="mb-8 text-center">
-            <Button
-              onClick={() => setShowCreateEvent(true)}
-              className="bg-[#4CAF50] hover:bg-[#388E3C]"
-            >
-              <PlusIcon className="mr-2" />
-              Create Event
-            </Button>
-          </div>
-        )}
-
         {/* Events List */}
-        {loading ? (
-          <div className="grid grid-cols-1 gap-6">
-            {[...Array(3)].map((_, index) => (
-              <EventSkeleton key={index} />
-            ))}
-          </div>
-        ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {filteredEvents.length > 0 ? (
-              filteredEvents.map((event) => (
-                <EventCard key={event._id} event={event} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading
+            ? Array.from({ length: eventsPerPage }).map((_, index) => (
+                <EventSkeleton key={index} />
               ))
-            ) : (
-              <div className="col-span-full text-center text-lg text-[#B2DFDB]">
-                No events found.
-              </div>
-            )}
-          </motion.div>
-        )}
-      </motion.div>
+            : currentEvents.length > 0
+            ? currentEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))
+            : <NoEventsFound resetFilters={resetFilters} />}
+        </div>
 
-      {/* Create Event Form Modal */}
-      {showCreateEvent && (
-        <CreateEventForm onClose={() => setShowCreateEvent(false)} />
-      )}
+        {/* Pagination Controls */}
+        <div className="flex justify-between mt-8">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="bg-[#4CAF50] text-white"
+          >
+            <ChevronLeftIcon className="mr-2" /> Previous
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="bg-[#4CAF50] text-white"
+          >
+            Next <ChevronRightIcon className="ml-2" />
+          </Button>
+        </div>
+      </motion.div>
 
       <Footer />
     </div>

@@ -16,14 +16,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
-import { CalendarIcon, SaveIcon } from "lucide-react";
+import { 
+  CalendarIcon, 
+  SaveIcon, 
+  AlertCircleIcon 
+} from "lucide-react";
 
+// Updated schema with type coercion for maxParticipants
 const eventSchema = z.object({
   name: z
     .string()
@@ -55,9 +60,14 @@ const eventSchema = z.object({
     city: z.string().min(2, "City is required"),
     state: z.string().optional(),
   }),
-  maxParticipants: z.number().min(1).max(100),
+  // Use coerce to convert to number
+  maxParticipants: z.coerce
+    .number()
+    .int("Must be a whole number")
+    .min(1, "At least 1 participant required")
+    .max(100, "Maximum 100 participants allowed"),
   difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]),
-  registrationFee: z.number().min(0).optional(),
+  registrationFee: z.coerce.number().min(0, "Fee cannot be negative").optional(),
 });
 
 const CreateEventForm = () => {
@@ -87,21 +97,42 @@ const CreateEventForm = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      await createEvent(data);
+      // Validate data before submission
+      const validatedData = eventSchema.parse(data);
+      
+      await createEvent(validatedData);
       toast.success("Event created successfully!", {
+        icon: '🎉',
         style: {
           background: "#0F2C2C",
           color: "#E0F2F1",
+          border: "1px solid #4CAF50",
         },
       });
       navigate("/events");
     } catch (error) {
-      toast.error("Failed to create event", {
-        style: {
-          background: "#2C3E50",
-          color: "#ECF0F1",
-        },
-      });
+      // Handle different types of errors
+      if (error instanceof z.ZodError) {
+        // Zod validation errors
+        const errorMessages = error.errors.map(err => err.message);
+        toast.error(errorMessages[0], {
+          icon: <AlertCircleIcon className="text-red-500" />,
+          style: {
+            background: "#2C3E50",
+            color: "#ECF0F1",
+          },
+        });
+      } else {
+        // API or network errors
+        const errorMessage = error.response?.data?.message || "Failed to create event";
+        toast.error(errorMessage, {
+          icon: <AlertCircleIcon className="text-red-500" />,
+          style: {
+            background: "#2C3E50",
+            color: "#ECF0F1",
+          },
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -109,17 +140,24 @@ const CreateEventForm = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1A1A] via-[#0F2C2C] to-[#0A1A1A] p-4">
-      <div className="w-full max-w-md bg-[#0F2C2C]/70 rounded-xl shadow-lg p-8">
-        <div className="text-center mb-6">
+      <div className="w-full max-w-2xl bg-[#0F2C2C]/70 rounded-xl shadow-2xl p-8">
+        <div className="text-center mb-8">
           <CalendarIcon
-            className="mx-auto h-12 w-12 text-[#4CAF50] mb-4"
+            className="mx-auto h-16 w-16 text-[#4CAF50] mb-4 animate-pulse"
             strokeWidth={1.5}
           />
-          <h2 className="text-3xl font-bold text-[#E0F2F1]">Create Event</h2>
+          <h2 className="text-4xl font-bold text-[#E0F2F1]">Create New Event</h2>
+          <p className="text-[#81C784] mt-2">
+            Fill in the details for your upcoming sports event
+          </p>
         </div>
+        
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Form fields similar to RegisterForm style */}
+          <form 
+            onSubmit={form.handleSubmit(onSubmit)} 
+            className="space-y-6"
+          >
+            {/* Event Name */}
             <FormField
               control={form.control}
               name="name"
@@ -130,7 +168,8 @@ const CreateEventForm = () => {
                     <Input
                       {...field}
                       placeholder="Enter event name"
-                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                      focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
                   <FormMessage className="text-[#FF5252]" />
@@ -138,45 +177,75 @@ const CreateEventForm = () => {
               )}
             />
 
-            {/* Add more form fields following similar styling */}
-            {/* Category */}
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
-                      {[
-                        "Football",
-                        "Basketball",
-                        "Tennis",
-                        "Running",
-                        "Cycling",
-                        "Swimming",
-                        "Volleyball",
-                        "Cricket",
-                        "Other",
-                      ].map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Category and Difficulty Row */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Category */}
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#B0BEC5]">Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger 
+                          className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 
+                          text-[#E0F2F1] focus:ring-2 focus:ring-[#4CAF50]/50"
+                        >
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
+                        {[
+                          "Cricket","Football", "Basketball", "Tennis", "Running", 
+                          "Cycling", "Swimming", "Volleyball",  "Other"
+                        ].map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-[#FF5252]" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Difficulty */}
+              <FormField
+                control={form.control}
+                name="difficulty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#B0BEC5]">Difficulty</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger 
+                          className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 
+                          text-[#E0F2F1] focus:ring-2 focus:ring-[#4CAF50]/50"
+                        >
+                          <SelectValue placeholder="Select difficulty" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
+                        {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                          <SelectItem key={level} value={level}>
+                            {level}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-[#FF5252]" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Description */}
             <FormField
@@ -184,92 +253,98 @@ const CreateEventForm = () => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel className="text-[#B0BEC5]">Description</FormLabel>
                   <FormControl>
-                    <textarea
+                    <Input
                       {...field}
-                      placeholder="Describe your event"
-                      className="w-full bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] rounded-md p-2"
-                      rows={4}
+                      placeholder="Enter event description"
+                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                      focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[#FF5252]" />
                 </FormItem>
               )}
             />
 
             {/* Date and Time */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel className="text-[#B0BEC5]">Event Date</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
                         {...field}
-                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#FF5252]" />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Time</FormLabel>
+                    <FormLabel className="text-[#B0BEC5]">Event Time</FormLabel>
                     <FormControl>
                       <Input
                         type="time"
                         {...field}
-                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#FF5252]" />
                   </FormItem>
                 )}
               />
             </div>
 
             {/* Location */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="location.address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter address"
-                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="location.address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#B0BEC5]">Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Enter event address"
+                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                      focus:ring-2 focus:ring-[#4CAF50]/50"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[#FF5252]" />
+                </FormItem>
+              )}
+            />
 
+            <div className="grid md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="location.city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel 
+                    className="text-[#B0BEC5]">City</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Enter city"
-                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#FF5252]" />
                   </FormItem>
                 )}
               />
@@ -279,15 +354,16 @@ const CreateEventForm = () => {
                 name="location.state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>State (optional)</FormLabel>
+                    <FormLabel className="text-[#B0BEC5]">State (optional)</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Enter state"
-                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                        className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#FF5252]" />
                   </FormItem>
                 )}
               />
@@ -299,46 +375,17 @@ const CreateEventForm = () => {
               name="maxParticipants"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Max Participants</FormLabel>
+                  <FormLabel className="text-[#B0BEC5]">Max Participants</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       {...field}
-                      min={1}
-                      max={100}
-                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                      placeholder="Enter max participants"
+                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                      focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Difficulty Level */}
-            <FormField
-              control={form.control}
-              name="difficulty"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Difficulty Level</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
-                        <SelectValue placeholder="Select difficulty" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
-                      {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
+                  <FormMessage className="text-[#FF5252]" />
                 </FormItem>
               )}
             />
@@ -349,27 +396,28 @@ const CreateEventForm = () => {
               name="registrationFee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Registration Fee (optional)</FormLabel>
+                  <FormLabel className="text-[#B0BEC5]">Registration Fee (optional)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       {...field}
-                      min={0}
-                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]"
+                      placeholder="Enter registration fee"
+                      className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
+                      focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[#FF5252]" />
                 </FormItem>
               )}
             />
 
+            {/* Submit Button */}
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#4CAF50] hover:bg-[#388E3C] text-white"
+              className="w-full bg-[#4CAF50] text-[#E0F2F1] hover:bg-[#388E3C] transition duration-200"
             >
               {isLoading ? "Creating..." : "Create Event"}
-              <SaveIcon className="ml-2" />
             </Button>
           </form>
         </Form>
