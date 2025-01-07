@@ -10,9 +10,9 @@ import Home from "./pages/Home";
 import Events from "./pages/Events";
 import EventCreate from "./pages/EventCreate";
 import EventDetails from "./components/events/EventDetails";
-import EventEdit from "./pages/EventEdit";
 import SportsBuddyLoader from "./components/layout/Loader";
 import NotFound from "./pages/NotFound";
+import EventEditForm from "./components/events/EventEditForm";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -61,7 +61,7 @@ function App() {
         path="/events/edit/:id"
         element={
           <ProtectedRoute>
-            <EventEdit />
+            <EventEditForm />
           </ProtectedRoute>
         }
       />

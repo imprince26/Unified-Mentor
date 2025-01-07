@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useCallback } from "react";
 import api from "@/utils/api";
+import SportsBuddyLoader from "@/components/layout/Loader";
 
 const EventContext = createContext();
 

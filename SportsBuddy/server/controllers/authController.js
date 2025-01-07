@@ -158,7 +158,6 @@ export const getCurrentUser = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        profileImage: user.profileImage || null
       }
     });
   } catch (error) {

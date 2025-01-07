@@ -13,11 +13,9 @@ import {
   UsersIcon,
   EditIcon,
   TrashIcon,
-  ClockIcon,
   TagIcon,
   TrophyIcon,
   IndianRupee ,
-  UserCheckIcon,
 } from "lucide-react";
 import { formatDate, formatTime, formatCurrency } from "@/utils/formatters";
 import { toast } from "react-hot-toast";
@@ -57,6 +55,7 @@ const EventDetails = () => {
     }
 
     try {
+      alert("Are you sure you want to delete this event?");
       await deleteEvent(id);
       toast.success("Event deleted successfully", {
         style: {
@@ -91,7 +90,6 @@ const EventDetails = () => {
   if (loading) return <SportsBuddyLoader />;
   if (!event) return <div>Event not found</div>;
 
-  // Difficulty level color mapping
   const difficultyColors = {
     Beginner: "bg-green-500/20 text-green-600 border-green-500",
     Intermediate: "bg-yellow-500/20 text-yellow-600 border-yellow-500",
@@ -198,7 +196,7 @@ const EventDetails = () => {
           </div>
 
           {/* Admin Actions */}
-          {user?.role === "admin" && (
+          {/* {user?.role === "admin" && (
             <div className="p-6 flex justify-between border-t border-[#2E7D32]/30">
               <Button
                 onClick={handleEditEvent}
@@ -209,12 +207,12 @@ const EventDetails = () => {
               <Button
                 onClick={handleDeleteEvent}
                 className="bg ```jsx
-                red-500 text-white hover:bg-red-600"
+                red-500 text-white bg-red-500 hover:bg-red-600"
               >
                 <TrashIcon className="mr-2" /> Delete Event
               </Button>
             </div>
-          )}
+          )} */}
           
         </div>
       </motion.div>
