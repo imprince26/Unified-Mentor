@@ -12,7 +12,6 @@ import EventCreate from "./pages/EventCreate";
 import EventDetails from "./components/events/EventDetails";
 import SportsBuddyLoader from "./components/layout/Loader";
 import NotFound from "./pages/NotFound";
-import EventEditForm from "./components/events/EventEditForm";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -57,14 +56,14 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/events/edit/:id"
         element={
           <ProtectedRoute>
             <EventEditForm />
           </ProtectedRoute>
         }
-      />
+      /> */}
 
       <Route
         path="/events/:id"
