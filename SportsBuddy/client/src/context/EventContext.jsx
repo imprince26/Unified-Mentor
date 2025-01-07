@@ -72,8 +72,7 @@ export const EventProvider = ({ children }) => {
       setSelectedEvent(response.data.data);
       return response.data.data;
     } catch (error) {
-      console.error("Error fetching event details", error);
-      throw error;
+      return null;
     } finally {
       setLoading(false);
     }

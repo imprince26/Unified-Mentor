@@ -43,7 +43,7 @@ const EventDetails = () => {
         setCanModifyEvent(isCreator || isAdmin);
       } catch (error) {
         console.error("Error fetching event:", error);
-        navigate("/events");
+        navigate("/");
       } finally {
         setLoading(false);
       }
@@ -76,7 +76,7 @@ const EventDetails = () => {
             color: "#E0F2F1",
           },
         });
-        navigate("/events");
+        navigate("/");
       }
     } catch (error) {
       toast.error("Failed to delete event", {
