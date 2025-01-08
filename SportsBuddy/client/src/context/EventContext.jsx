@@ -90,6 +90,9 @@ export const EventProvider = ({ children }) => {
     getEventById,
     setSelectedEvent,
   };
+  if (loading) {
+    return <SportsBuddyLoader />;
+  }
   return (
     <EventContext.Provider value={contextValue}>
       {children}
