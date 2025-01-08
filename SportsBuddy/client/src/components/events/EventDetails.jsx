@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -15,11 +14,12 @@ import {
   TrashIcon,
   TagIcon,
   TrophyIcon,
-  IndianRupee ,
+  IndianRupee,
 } from "lucide-react";
 import { formatDate, formatTime, formatCurrency } from "@/utils/formatters";
 import { toast } from "react-hot-toast";
 import SportsBuddyLoader from "../layout/Loader";
+
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -27,13 +27,22 @@ const EventDetails = () => {
   const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [canModifyEvent, setCanModifyEvent] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         const fetchedEvent = await getEventById(id);
         setEvent(fetchedEvent);
+
+        // Check if the current user can modify the event
+        // Convert both to strings to ensure proper comparison
+        const isCreator = user?.id === fetchedEvent.createdBy;
+        const isAdmin = user?.role === "admin";
+
+        setCanModifyEvent(isCreator || isAdmin);
       } catch (error) {
+        console.error("Error fetching event:", error);
         navigate("/events");
       } finally {
         setLoading(false);
@@ -41,11 +50,11 @@ const EventDetails = () => {
     };
 
     fetchEvent();
-  }, [id, getEventById, navigate]);
+  }, [id, getEventById, navigate, user]);
 
   const handleDeleteEvent = async () => {
-    if (user?.role !== "admin") {
-      toast.error("Only admins can delete events", {
+    if (!canModifyEvent) {
+      toast.error("You are not authorized to delete this event", {
         style: {
           background: "#2C3E50",
           color: "#ECF0F1",
@@ -55,15 +64,20 @@ const EventDetails = () => {
     }
 
     try {
-      alert("Are you sure you want to delete this event?");
-      await deleteEvent(id);
-      toast.success("Event deleted successfully", {
-        style: {
-          background: "#0F2C2C",
-          color: "#E0F2F1",
-        },
-      });
-      navigate("/events");
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this event?"
+      );
+
+      if (confirmDelete) {
+        await deleteEvent(id);
+        toast.success("Event deleted successfully", {
+          style: {
+            background: "#0F2C2C",
+            color: "#E0F2F1",
+          },
+        });
+        navigate("/events");
+      }
     } catch (error) {
       toast.error("Failed to delete event", {
         style: {
@@ -75,8 +89,8 @@ const EventDetails = () => {
   };
 
   const handleEditEvent = () => {
-    if (user?.role !== "admin") {
-      toast.error("Only admins can edit events", {
+    if (!canModifyEvent) {
+      toast.error("You are not authorized to edit this event", {
         style: {
           background: "#2C3E50",
           color: "#ECF0F1",
@@ -166,7 +180,7 @@ const EventDetails = () => {
               </div>
 
               <div className="flex items-center space-x-4">
-                <IndianRupee  className="text-[#4CAF50]" size={24} />
+                <IndianRupee className="text-[#4CAF50]" size={24} />
                 <div>
                   <p className="text-[#81C784]">Registration Fee</p>
                   <p className="font-semibold">
@@ -195,8 +209,8 @@ const EventDetails = () => {
             <p className="text-[#B2DFDB]">{event.description}</p>
           </div>
 
-          {/* Admin Actions */}
-          {/* {user?.role === "admin" && (
+          {/* Admin/Creator Actions */}
+          {canModifyEvent && (
             <div className="p-6 flex justify-between border-t border-[#2E7D32]/30">
               <Button
                 onClick={handleEditEvent}
@@ -206,14 +220,12 @@ const EventDetails = () => {
               </Button>
               <Button
                 onClick={handleDeleteEvent}
-                className="bg ```jsx
-                red-500 text-white bg-red-500 hover:bg-red-600"
+                className="bg-red-500 text-white hover:bg-red-600"
               >
                 <TrashIcon className="mr-2" /> Delete Event
               </Button>
             </div>
-          )} */}
-          
+          )}
         </div>
       </motion.div>
 

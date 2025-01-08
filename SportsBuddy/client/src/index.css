@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Green Selection Styles */
 body {
   transition: background-color 0.3s ease, color 0.3s ease;
+  ::selection {
+    background-color: #2E7D32;
+    color: #E8F5E9 
+  }
+  ::-moz-selection {
+    background-color: #2E7D32;
+    color: #E8F5E9;
+  }
+
+  input::selection,
+  textarea::selection {
+    background-color: #2E7D32;
+    color: #E8F5E9;
+  }
 }
 
 @layer base {
@@ -62,10 +77,10 @@ body {
   }
 }
 
-body{
+/* body{
   background-color: black;
   color: white;
-}
+} */
 @layer base {
   * {
     @apply border-border;

@@ -42,9 +42,3 @@ Sports Buddy is a comprehensive web application designed to connect  facilitate 
 - Mongoose
 - JWT Authentication
 - Bcrypt.js
-
-## 🔧 Prerequisites
-
-- Node.js (v18+)
-- npm or Yarn
-- MongoDB

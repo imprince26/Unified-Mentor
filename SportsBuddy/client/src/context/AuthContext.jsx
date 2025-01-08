@@ -19,20 +19,31 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Add detailed logging
+  useEffect(() => {
+    console.log("AuthContext Initial State:", { 
+      user, 
+      isAuthenticated, 
+      isLoading 
+    });
+  }, [user, isAuthenticated, isLoading]);
+
   useEffect(() => {
     checkUserAuthentication();
   }, []);
 
-  const checkUserAuthentication = async (next) => {
+  const checkUserAuthentication = async () => {
     try {
       const response = await api.get("/auth/me");
+      
+      console.log("Authentication Response:", response.data);
+
       setUser(response.data.data);
       setIsAuthenticated(true);
     } catch (error) {
+      console.error("Authentication Error:", error);
       setUser(null);
-      console.log(error);
       setIsAuthenticated(false);
-      next();
     } finally {
       setIsLoading(false);
     }

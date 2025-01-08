@@ -55,8 +55,7 @@ const LoginForm = () => {
       const response = await login(data);
     } catch (error) {
       const errorMessage = handleApiError(error);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -129,6 +128,7 @@ const LoginForm = () => {
                           placeholder-[#607D8B]
                           transition-all duration-300 ease-in-out
                           focus:outline-none
+                          focus-visible:ring-0
                           ${
                             inputStates.email.isFocused
                               ? "ring-2 ring-[#4CAF50]/50 border-[#4CAF50]/70"
@@ -189,6 +189,7 @@ const LoginForm = () => {
                           placeholder-[#607D8B]
                           transition-all duration-300 ease-in-out
                           focus:outline-none
+                          focus-visible:ring-0
                           ${
                             inputStates.password.isFocused
                               ? "ring-2 ring-[#4CAF50]/50 border-[#4CAF50]/70"
@@ -205,7 +206,7 @@ const LoginForm = () => {
                       variant="ghost"
                       size="icon"
                       onClick={togglePasswordVisibility}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 text-[#607D8B] hover:text-[#4CAF50]"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 text-[#607D8B] hover:bg-[#1D4E4E] hover:text-[#4CAF50]"
                     >
                       {showPassword ? (
                         <EyeOffIcon size={20} />
