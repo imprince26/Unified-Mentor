@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useCallback } from "react";
 import api from "@/utils/api";
-import SportsBuddyLoader from "@/components/layout/Loader";
 
 const EventContext = createContext();
 
@@ -90,9 +89,6 @@ export const EventProvider = ({ children }) => {
     getEventById,
     setSelectedEvent,
   };
-  if (loading) {
-    return <SportsBuddyLoader />;
-  }
   return (
     <EventContext.Provider value={contextValue}>
       {children}
