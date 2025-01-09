@@ -67,14 +67,17 @@ export const EventProvider = ({ children }) => {
 
   const getEventById = async (eventId) => {
     try {
-      setLoading(true);
       const response = await api.get(`/events/${eventId}`);
-      setSelectedEvent(response.data.data);
+      if (!response.data.data) {
+        return null; 
+      }
       return response.data.data;
     } catch (error) {
-      return null;
-    } finally {
-      setLoading(false);
+      if (error.response && error.response.status === 404) {
+        return null;
+      } else {
+        throw error; 
+      }
     }
   };
   const contextValue = {

@@ -33,22 +33,22 @@ const EventDetails = () => {
     const fetchEvent = async () => {
       try {
         const fetchedEvent = await getEventById(id);
+        if (!fetchedEvent) {
+          navigate("/");
+          return;
+        }
         setEvent(fetchedEvent);
-
-        // Check if the current user can modify the event
-        // Convert both to strings to ensure proper comparison
+    
         const isCreator = user?.id === fetchedEvent.createdBy;
         const isAdmin = user?.role === "admin";
-
+    
         setCanModifyEvent(isCreator || isAdmin);
       } catch (error) {
-        console.error("Error fetching event:", error);
-        navigate("/");
+        navigate("/"); 
       } finally {
         setLoading(false);
       }
     };
-
     fetchEvent();
   }, [id, getEventById, navigate, user]);
 
@@ -212,12 +212,12 @@ const EventDetails = () => {
           {/* Admin/Creator Actions */}
           {canModifyEvent && (
             <div className="p-6 flex justify-between border-t border-[#2E7D32]/30">
-              <Button
+              {/* <Button
                 onClick={handleEditEvent}
                 className="bg-blue-500 text-white hover:bg-blue-600"
               >
                 <EditIcon className="mr-2" /> Edit Event
-              </Button>
+              </Button> */}
               <Button
                 onClick={handleDeleteEvent}
                 className="bg-red-500 text-white hover:bg-red-600"
