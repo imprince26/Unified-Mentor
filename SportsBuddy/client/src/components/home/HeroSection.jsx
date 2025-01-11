@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { ActivityIcon, SearchIcon, PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,7 +80,6 @@ const HeroSection = () => {
           </motion.div>
         </motion.div>
 
-        {/* Animated Sports Illustration */}
         <motion.div
           className="hidden md:flex justify-center relative"
           variants={itemVariants}

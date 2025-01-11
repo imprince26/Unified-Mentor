@@ -1,8 +1,6 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-// Import components
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
@@ -10,20 +8,13 @@ import FeaturedSports from "@/components/home/FeaturedSports";
 import UpcomingEvents from "@/components/home/UpcomingEvents";
 import CallToAction from "@/components/home/CallToAction";
 
-// Icons
-import {
-  CalendarIcon,
-  UsersIcon,
-  ActivityIcon,
-} from "lucide-react";
+import { CalendarIcon, UsersIcon, ActivityIcon } from "lucide-react";
 
-// Button component
 import { Button } from "@/components/ui/button";
 
 const Home = () => {
   const navigate = useNavigate();
 
-  // Page section variants for animation
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {

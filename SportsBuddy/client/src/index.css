@@ -5,10 +5,12 @@
 /* Green Selection Styles */
 body {
   transition: background-color 0.3s ease, color 0.3s ease;
+
   ::selection {
     background-color: #2E7D32;
-    color: #E8F5E9 
+    color: #E8F5E9
   }
+
   ::-moz-selection {
     background-color: #2E7D32;
     color: #E8F5E9;
@@ -49,6 +51,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -77,16 +80,12 @@ body {
   }
 }
 
-/* body{
-  background-color: black;
-  color: white;
-} */
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
-

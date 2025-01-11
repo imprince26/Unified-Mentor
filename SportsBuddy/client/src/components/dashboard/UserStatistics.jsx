@@ -1,17 +1,13 @@
-import React from "react";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  ResponsiveContainer 
+/* eslint-disable react/prop-types */
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
-import { 
-  CalendarIcon, 
-  UsersIcon, 
-  TrendingUpIcon 
-} from "lucide-react";
+import { CalendarIcon, UsersIcon, TrendingUpIcon } from "lucide-react";
 
 const UserStatistics = ({ events }) => {
   // Calculate statistics
@@ -20,10 +16,11 @@ const UserStatistics = ({ events }) => {
     (event) => new Date(event.date) > new Date()
   ).length;
   const participationRate = Math.round(
-    (events.filter((event) => event.participants.length > 0).length / totalEvents) * 100
+    (events.filter((event) => event.participants.length > 0).length /
+      totalEvents) *
+      100
   );
 
-  // Data for the bar chart
   const chartData = [
     { name: "Total Events", value: totalEvents },
     { name: "Upcoming Events", value: upcomingEvents },
@@ -57,7 +54,9 @@ const UserStatistics = ({ events }) => {
             </div>
             <div>
               <p className="text-[#81C784]">Upcoming Events</p>
-              <p className="text-2xl font-bold text-[#4CAF50]">{upcomingEvents}</p>
+              <p className="text-2xl font-bold text-[#4CAF50]">
+                {upcomingEvents}
+              </p>
             </div>
           </div>
         </div>
@@ -70,7 +69,9 @@ const UserStatistics = ({ events }) => {
             </div>
             <div>
               <p className="text-[#81C784]">Participation Rate</p>
-              <p className="text-2xl font-bold text-[#4CAF50]">{participationRate}%</p>
+              <p className="text-2xl font-bold text-[#4CAF50]">
+                {participationRate}%
+              </p>
             </div>
           </div>
         </div>
@@ -83,27 +84,16 @@ const UserStatistics = ({ events }) => {
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
-            <XAxis 
-              dataKey="name" 
-              stroke="#81C784" 
-              tick={{ fill: "#81C784" }} 
-            />
-            <YAxis 
-              stroke="#81C784" 
-              tick={{ fill: "#81C784" }} 
-            />
-            <Tooltip 
+            <XAxis dataKey="name" stroke="#81C784" tick={{ fill: "#81C784" }} />
+            <YAxis stroke="#81C784" tick={{ fill: "#81C784" }} />
+            <Tooltip
               contentStyle={{
                 backgroundColor: "#0F2C2C",
                 border: "1px solid #4CAF50",
                 borderRadius: "8px",
               }}
             />
-            <Bar 
-              dataKey="value" 
-              fill="#4CAF50" 
-              radius={[4, 4, 0, 0]} 
-            />
+            <Bar dataKey="value" fill="#4CAF50" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

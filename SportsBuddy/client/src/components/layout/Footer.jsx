@@ -1,4 +1,3 @@
-import React from "react";
 import { ActivityIcon } from "lucide-react";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
@@ -54,7 +53,9 @@ const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#4CAF50] hover:text-[#81C784]"
-            >Prince Patel</a>
+          >
+            Prince Patel
+          </a>
         </p>
       </div>
     </footer>

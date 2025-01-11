@@ -22,6 +22,7 @@ Sports Buddy is a comprehensive web application designed to connect  facilitate 
 - **Event Discovery**: Browse and filter sports events across various categories
 - **User Authentication**: Secure login and registration system
 - **Event Creation**: Easily create and manage sports events
+- **Participation** : User Can easily participate in any sports events
 - **Responsive Design**: Mobile and desktop-friendly interface
 - **Role-based Access**: Different permissions for users and administrators
 

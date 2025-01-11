@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
@@ -8,12 +7,12 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
-import EventCreate from "./pages/EventCreate";
+import CreateEvent from "./pages/CreateEvent";
 import EventDetails from "./components/events/EventDetails";
 import SportsBuddyLoader from "./components/layout/Loader";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Profile";
-// import UpdateEventForm from "./components/events/UpdateEventForm";
+import EditEvent from "./pages/EditEvent";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -39,8 +38,6 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/" element={<Home />} />
-      {/* Protected Routes */}
-
       <Route
         path="/events"
         element={
@@ -54,18 +51,18 @@ function App() {
         path="/events/create"
         element={
           <ProtectedRoute>
-            <EventCreate />
+            <CreateEvent />
           </ProtectedRoute>
         }
       />
-      {/* <Route
+      <Route
         path="/events/edit/:id"
         element={
           <ProtectedRoute>
-           <UpdateEventForm />
+            <EditEvent />
           </ProtectedRoute>
         }
-      /> */}
+      />
 
       <Route
         path="/events/:id"
@@ -75,7 +72,14 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/events/user/my-events" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route
+        path="/events/user/my-events"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
 
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />

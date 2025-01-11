@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { AlertTriangleIcon, HomeIcon, RefreshCwIcon } from "lucide-react";
 const NotFound = () => {
   const navigate = useNavigate();
 
-  // Animated background elements
   const BackgroundElements = () => (
     <>
       {[...Array(10)].map((_, index) => (
@@ -37,7 +35,6 @@ const NotFound = () => {
     </>
   );
 
-  // Error illustration variant
   const illustrationVariants = {
     initial: {
       opacity: 0,
@@ -129,7 +126,6 @@ const NotFound = () => {
         </div>
       </motion.div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

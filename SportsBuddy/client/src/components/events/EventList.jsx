@@ -1,5 +1,4 @@
-// src/components/events/EventList.jsx
-import React from "react";
+/* eslint-disable react/prop-types */
 import EventCard from "./EventCard";
 
 const EventList = ({ events }) => {

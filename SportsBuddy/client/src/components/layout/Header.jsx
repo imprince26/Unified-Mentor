@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   MenuIcon,
   ActivityIcon,
@@ -98,11 +98,14 @@ const Header = () => {
                 <div className="hidden"></div>
               ) : (
                 <div className="hidden md:flex items-center space-x-4">
-                  <Button onClick={() => navigate("/events/user/my-events")} className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2">
+                  <Button
+                    onClick={() => navigate("/events/user/my-events")}
+                    className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2"
+                  >
                     <UserIcon className="h-6 w-6 text-[#4CAF50]" />
                     <span className="text-[#E0F2F1] font-semibold">
-                    {user ? user.name : "Guest"}
-                  </span>
+                      {user ? user.name : "Guest"}
+                    </span>
                   </Button>
                   <Button
                     variant="ghost"
@@ -163,12 +166,15 @@ const Header = () => {
             >
               {/* Sidebar Header */}
               <div className="flex justify-between items-center p-4 border-b border-[#2E7D32]/20">
-              <Button onClick={() => navigate("/events/user/my-events")} className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2">
-                    <UserIcon className="h-6 w-6 text-[#4CAF50]" />
-                    <span className="text-[#E0F2F1] font-semibold">
+                <Button
+                  onClick={() => navigate("/events/user/my-events")}
+                  className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2"
+                >
+                  <UserIcon className="h-6 w-6 text-[#4CAF50]" />
+                  <span className="text-[#E0F2F1] font-semibold">
                     {user ? user.name : "Guest"}
                   </span>
-                  </Button>
+                </Button>
                 <Button
                   variant="ghost"
                   className="hover:bg-[#FF5252]/10"

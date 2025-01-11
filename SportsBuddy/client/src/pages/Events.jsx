@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
 import { useAuth } from "@/context/AuthContext";
@@ -41,20 +41,16 @@ const Events = () => {
   const navigate = useNavigate();
   const { events, fetchEvents, loading } = useEvents();
   const { user } = useAuth();
-
-  // State Management
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL_CATEGORIES");
   const [difficultyFilter, setDifficultyFilter] = useState("ALL_LEVELS");
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 6;
 
-  // Fetch events on component mount
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
 
-  // Categories and difficulty levels
   const categories = [
     "Football",
     "Basketball",
@@ -69,7 +65,6 @@ const Events = () => {
 
   const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
 
-  // Filtered and Memoized Events
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
       // Search filter
@@ -210,7 +205,6 @@ const Events = () => {
             ))
           ) : currentEvents.length === 0 ? (
             <div className="text-center h-20 w-[100vw] text-[#81C784]">
-              
               <p className="text-2xl font-semibold">No events found.</p>
             </div>
           ) : (
@@ -222,7 +216,11 @@ const Events = () => {
 
         {/* Pagination Controls */}
         <div className="flex justify-between mt-8">
-          <Button onClick={handlePrevPage} disabled={currentPage === 1} className="bg-[#4CAF50] hover:bg-[#2E7D32]">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="bg-[#4CAF50] hover:bg-[#2E7D32]"
+          >
             <ChevronLeftIcon className="mr-2" /> Previous
           </Button>
           <Button

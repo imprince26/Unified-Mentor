@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  CalendarIcon, 
-  MapPinIcon, 
-  UsersIcon, 
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  CalendarIcon,
+  MapPinIcon,
+  UsersIcon,
   ArrowRightIcon,
   StarIcon,
-  AlertCircleIcon
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useEvents } from '@/context/EventContext';
-import { useNavigate } from 'react-router-dom';
-import { formatDate, formatTime } from '@/utils/formatters';
-import { Skeleton } from '@/components/ui/skeleton';
+  AlertCircleIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEvents } from "@/context/EventContext";
+import { useNavigate } from "react-router-dom";
+import { formatDate, formatTime } from "@/utils/formatters";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const EventCardSkeleton = () => (
   <div className="bg-[#0F2C2C]/30 rounded-2xl p-6 space-y-4">
@@ -31,65 +31,62 @@ const UpcomingEvents = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   useEffect(() => {
-    // Fetch events if not already loaded
     if (events.length === 0) {
       fetchEvents();
     }
   }, [fetchEvents, events.length]);
 
   useEffect(() => {
-    // Process events when they are loaded
     if (events.length > 0) {
       const today = new Date();
       const filteredEvents = events
-        .filter(event => {
+        .filter((event) => {
           const eventDate = new Date(event.date);
           return eventDate > today;
         })
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice(0, 3);
-      
+
       setUpcomingEvents(filteredEvents);
     }
   }, [events]);
 
-  // Variants for animation
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.3
-      }
-    }
+        staggerChildren: 0.3,
+      },
+    },
   };
 
   const eventCardVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 50 
+    hidden: {
+      opacity: 0,
+      y: 50,
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
-      }
+        ease: "easeOut",
+      },
     },
     hover: {
       scale: 1.05,
       transition: {
-        duration: 0.3
-      }
-    }
+        duration: 0.3,
+      },
+    },
   };
 
   // Difficulty level color mapping
   const difficultyColors = {
-    'Beginner': 'bg-green-500/20 border-green-500',
-    'Intermediate': 'bg-yellow-500/20 border-yellow-500',
-    'Advanced': 'bg-red-500/20 border-red-500'
+    Beginner: "bg-green-500/20 border-green-500",
+    Intermediate: "bg-yellow-500/20 border-yellow-500",
+    Advanced: "bg-red-500/20 border-red-500",
   };
 
   // Render error state
@@ -102,9 +99,10 @@ const UpcomingEvents = () => {
             Unable to Load Events
           </h2>
           <p className="text-[#81C784] mb-6">
-            {error.message || 'An unexpected error occurred while fetching events.'}
+            {error.message ||
+              "An unexpected error occurred while fetching events."}
           </p>
-          <Button 
+          <Button
             onClick={() => fetchEvents()}
             className="bg-red-500 text-white hover:bg-red-600"
           >
@@ -116,15 +114,14 @@ const UpcomingEvents = () => {
   }
 
   return (
-    <motion.section 
+    <motion.section
       className="container mx-auto px-4 py-16 relative"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
       variants={containerVariants}
     >
-      {/* Section Title */}
-      <motion.h2 
+      <motion.h2
         className="text-4xl font-bold text-center text-[#E0F2F1] mb-12 relative z-10"
         initial={{ opacity: 0, y: -50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -133,11 +130,10 @@ const UpcomingEvents = () => {
         Upcoming Events
         <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-[#4CAF50]"></div>
       </motion.h2>
-      
+
       {/* Events Grid */}
       <div className="grid md:grid-cols-3 gap-8 relative z-10">
         {loading ? (
-          // Skeleton Loading State
           <>
             <EventCardSkeleton />
             <EventCardSkeleton />
@@ -145,7 +141,7 @@ const UpcomingEvents = () => {
           </>
         ) : upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
-            <motion.div 
+            <motion.div
               key={event._id}
               className={`
                 ${difficultyColors[event.difficulty]} 
@@ -161,12 +157,18 @@ const UpcomingEvents = () => {
             >
               {/* Difficulty Badge */}
               <div className="absolute top-4 right-4 z-10">
-                <div className={`
+                <div
+                  className={`
                   px-3 py-1 rounded-full text-xs font-bold
-                  ${event.difficulty === 'Beginner' ? 'bg-green-500 text-white' : 
-                    event.difficulty === 'Intermediate' ? 'bg-yellow-500 text-black' : 
-                    'bg-red-500 text-white'}
-                `}>
+                  ${
+                    event.difficulty === "Beginner"
+                      ? "bg-green-500 text-white"
+                      : event.difficulty === "Intermediate"
+                      ? "bg-yellow-500 text-black"
+                      : "bg-red-500 text-white"
+                  }
+                `}
+                >
                   {event.difficulty}
                 </div>
               </div>
@@ -181,32 +183,36 @@ const UpcomingEvents = () => {
                 <div className="space-y-2">
                   <div className="flex items-center text-[#81C784]">
                     <CalendarIcon className="mr-2" size={18} />
-                    <span>{formatDate(event.date)} at {formatTime(event.time)}</span>
+                    <span>
+                      {formatDate(event.date)} at {formatTime(event.time)}
+                    </span>
                   </div>
 
                   <div className="flex items-center text-[#81C784]">
                     <MapPinIcon className="mr-2" size={18} />
-                    <span>{event.location.city}, {event.location.state}</span>
+                    <span>
+                      {event.location.city}, {event.location.state}
+                    </span>
                   </div>
 
                   <div className="flex items-center text-[#81C784]">
                     <UsersIcon className="mr-2" size={18} />
                     <span>
-                      {event.participants.length} / {event.maxParticipants} Participants
+                      {event.participants.length} / {event.maxParticipants}{" "}
+                      Participants
                     </span>
                   </div>
                 </div>
 
                 {/* View Details Button */}
-                <Button 
-                  onClick 
-                 ={() => navigate(`/events/${event._id}`)}
+                <Button
+                  onClick={() => navigate(`/events/${event._id}`)}
                   className="w-full mt-4 bg-[#4CAF50] text-white hover:bg-[#388E3C] group"
                 >
                   View Details
-                  <ArrowRightIcon 
-                    className="ml-2 group-hover:translate-x-1 transition-transform" 
-                    size={18} 
+                  <ArrowRightIcon
+                    className="ml-2 group-hover:translate-x-1 transition-transform"
+                    size={18}
                   />
                 </Button>
               </div>

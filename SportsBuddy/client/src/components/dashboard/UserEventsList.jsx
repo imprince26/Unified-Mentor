@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,16 +24,16 @@ const UserEventsList = ({ events, loading }) => {
           color: "#E0F2F1",
         },
       });
-
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to delete event";
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete event";
       toast.error(errorMessage, {
         style: {
           background: "#2C3E50",
           color: "#ECF0F1",
         },
       });
-    }finally {
+    } finally {
       window.location.reload();
     }
   };
@@ -113,6 +113,5 @@ const UserEventsList = ({ events, loading }) => {
     </div>
   );
 };
-
 
 export default UserEventsList;

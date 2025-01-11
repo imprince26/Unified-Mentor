@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 
 const featuredSports = [
@@ -42,7 +41,7 @@ const FeaturedSports = () => {
       </h2>
 
       <div className="grid md:grid-cols-4 gap-6">
-        {featuredSports.map((sport, index) => (
+        {featuredSports.map((sport) => (
           <motion.div
             key={sport.name}
             className={`${sport.color} rounded-xl p-6 text-center 

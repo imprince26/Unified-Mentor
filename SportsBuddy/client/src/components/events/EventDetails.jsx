@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -15,6 +16,8 @@ import {
   IndianRupee,
   UserPlus,
   UserMinus,
+  EditIcon,
+  TrashIcon,
 } from "lucide-react";
 import { formatDate, formatTime, formatCurrency } from "@/utils/formatters";
 import { toast } from "react-hot-toast";
@@ -23,10 +26,11 @@ import SportsBuddyLoader from "../layout/Loader";
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getEventById, participateInEvent, leaveEvent } = useEvents();
+  const { getEventById,deleteEvent, participateInEvent, leaveEvent } = useEvents();
   const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false)
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -37,6 +41,11 @@ const EventDetails = () => {
           return;
         }
         setEvent(fetchedEvent);
+           // Check if user is creator or admin
+           setIsAuthorized(
+            fetchedEvent.createdBy === user.id || user.role === "admin"
+          );
+         
       } catch (error) {
         navigate("/");
       } finally {
@@ -44,7 +53,8 @@ const EventDetails = () => {
       }
     };
     fetchEvent();
-  }, [id, getEventById, navigate, user]);
+  }, [id, getEventById, navigate, user, setIsAuthorized]);
+  console.log(isAuthorized)
 
   const handleParticipate = async () => {
     try {
@@ -80,7 +90,6 @@ const EventDetails = () => {
           },
           icon: <UserMinus className="text-red-500" />,
         });
-        // Refresh event details
         const updatedEvent = await getEventById(id);
         setEvent(updatedEvent);
       }
@@ -94,6 +103,29 @@ const EventDetails = () => {
       });
     }
   };
+
+   const handleDelete = async (eventId) => {
+      try {
+        await deleteEvent(eventId);
+        toast.success("Event deleted successfully!", {
+          style: {
+            background: "#0F2C2C",
+            color: "#E0F2F1",
+          },
+        });
+  
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Failed to delete event";
+        toast.error(errorMessage, {
+          style: {
+            background: "#2C3E50",
+            color: "#ECF0F1",
+          },
+        });
+      }finally {
+        window.location.reload();
+      }
+    };
 
   if (loading) return <SportsBuddyLoader />;
   if (!event) return <div>Event not found</div>;
@@ -120,7 +152,8 @@ const EventDetails = () => {
         <div className="max-w-4xl mx-auto bg-[#0F2C2C]/70 rounded-2xl shadow-2xl overflow-hidden">
           {/* Event Header */}
           <div className="bg-[#2E7D32]/20 p-6 border-b border-[#2E7D32]/30 flex justify-between items-center">
-            <div>
+            <div className="w-full md:flex md:flex-row flex-col md:justify-between justify-center items-center">
+              <div className="">
               <h1 className="text-3xl font-bold text-[#4CAF50] mb-2">
                 {event.name}
               </h1>
@@ -130,7 +163,27 @@ const EventDetails = () => {
               >
                 {event.difficulty} Level
               </div>
+              </div>
+                {/* Author actions */}
+          {isAuthorized && (
+            <div className="flex justify-center  ">
+            <Button
+                onClick={() => navigate(`/events/edit/${event._id}`)}
+                className="bg-[#4CAF50] hover:bg-[#388E3C] mr-4 "
+              >
+                <EditIcon className="mr-1" /> Edit
+              </Button>
+              <Button
+                onClick={() => handleDelete(event._id)}
+                className="bg-red-500 hover:bg-red-600"
+              >
+                <TrashIcon className="mr-1" /> Delete
+              </Button>
             </div>
+          )}
+            </div>
+
+        
           </div>
 
           {/* Event Details Grid */}

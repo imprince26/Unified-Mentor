@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,9 +20,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
-import { CalendarIcon, AlertCircleIcon } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { AlertCircleIcon, PencilRuler } from "lucide-react";
 
 const eventSchema = z.object({
   name: z
@@ -67,10 +68,51 @@ const eventSchema = z.object({
     .optional(),
 });
 
-const CreateEventForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { createEvent } = useEvents();
+const EditEventForm = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { getEventById, updateEvent } = useEvents();
+  const { user } = useAuth();
+  const [event, setEvent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const fetchedEvent = await getEventById(id);
+        if (!fetchedEvent) {
+          navigate("/events");
+          return;
+        }
+
+        // Check if user is creator or admin
+        setIsAuthorized(
+          fetchedEvent.createdBy === user.id || user.role === "admin"
+        );
+
+        setEvent(fetchedEvent);
+        form.reset({
+          name: fetchedEvent.name,
+          category: fetchedEvent.category,
+          description: fetchedEvent.description,
+          date: new Date(fetchedEvent.date).toISOString().split("T")[0],
+          time: fetchedEvent.time,
+          location: {
+            address: fetchedEvent.location.address,
+            city: fetchedEvent.location.city,
+            state: fetchedEvent.location.state || "",
+          },
+          maxParticipants: fetchedEvent.maxParticipants,
+          difficulty: fetchedEvent.difficulty,
+          registrationFee: fetchedEvent.registrationFee || 0,
+        });
+      } catch (error) {
+        navigate("/events");
+      }
+    };
+    fetchEvent();
+  }, [id, getEventById, navigate, user]);
 
   const form = useForm({
     resolver: zodResolver(eventSchema),
@@ -94,10 +136,8 @@ const CreateEventForm = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const validatedData = eventSchema.parse(data);
-
-      await createEvent(validatedData);
-      toast.success("Event created successfully!", {
+      await updateEvent(id, data);
+      toast.success("Event updated successfully!", {
         icon: "🎉",
         style: {
           background: "#0F2C2C",
@@ -105,52 +145,58 @@ const CreateEventForm = () => {
           border: "1px solid #4CAF50",
         },
       });
-      navigate("/events");
+      navigate(`/events/${id}`);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map((err) => err.message);
-        toast.error(errorMessages[0], {
-          icon: <AlertCircleIcon className="text-red-500" />,
-          style: {
-            background: "#2C3E50",
-            color: "#ECF0F1",
-          },
-        });
-      } else {
-        const errorMessage =
-          error.response?.data?.message || "Failed to create event";
-        toast.error(errorMessage, {
-          icon: <AlertCircleIcon className="text-red-500" />,
-          style: {
-            background: "#2C3E50",
-            color: "#ECF0F1",
-          },
-        });
-      }
+      const errorMessage =
+        error.response?.data?.message || "Failed to update event";
+      toast.error(errorMessage, {
+        icon: <AlertCircleIcon className="text-red-500" />,
+        style: {
+          background: "#2C3E50",
+          color: "#ECF0F1",
+        },
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1A1A] via-[#0F2C2C] to-[#0A1A1A]">
+        <div className="text-center text-[#E0F2F1]">
+          <AlertCircleIcon className="mx-auto text-[#FF5252] mb-4" size={64} />
+          <h2 className="text-2xl font-bold mb-4">Unauthorized Access</h2>
+          <p className="text-[#81C784] mb-6">
+            You are not authorized to edit this event.
+          </p>
+          <Button
+            onClick={() => navigate("/events")}
+            className="bg-[#4CAF50] hover:bg-[#388E3C]"
+          >
+            Back to Events
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1A1A] via-[#0F2C2C] to-[#0A1A1A] p-4">
       <div className="w-full max-w-2xl bg-[#0F2C2C]/70 rounded-xl shadow-2xl p-8">
         <div className="text-center mb-8">
-          <CalendarIcon
+          <PencilRuler
             className="mx-auto h-16 w-16 text-[#4CAF50] mb-4 animate-pulse"
             strokeWidth={1.5}
           />
-          <h2 className="text-4xl font-bold text-[#E0F2F1]">
-            Create New Event
-          </h2>
+          <h2 className="text-4xl font-bold text-[#E0F2F1]">Update Event</h2>
           <p className="text-[#81C784] mt-2">
-            Fill in the details for your upcoming sports event
+            Edit the details of your event below.
           </p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Event Name */}
             <FormField
               control={form.control}
               name="name"
@@ -159,13 +205,13 @@ const CreateEventForm = () => {
                   <FormLabel className="text-[#B0BEC5]">Event Name</FormLabel>
                   <FormControl>
                     <Input
+                      placeholder="Event Name"
                       {...field}
-                      placeholder="Enter event name"
                       className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
-                      focus:ring-2 focus:ring-[#4CAF50]/50"
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#FF5252]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -186,14 +232,13 @@ const CreateEventForm = () => {
                       <FormControl>
                         <SelectTrigger
                           className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 
-                          text-[#E0F2F1] focus:ring-2 focus:ring-[#4CAF50]/50"
+                            text-[#E0F2F1] focus:ring-2 focus:ring-[#4CAF50]/50"
                         >
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
                         {[
-                          "Cricket",
                           "Football",
                           "Basketball",
                           "Tennis",
@@ -201,6 +246,7 @@ const CreateEventForm = () => {
                           "Cycling",
                           "Swimming",
                           "Volleyball",
+                          "Cricket",
                           "Other",
                         ].map((category) => (
                           <SelectItem key={category} value={category}>
@@ -209,11 +255,10 @@ const CreateEventForm = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage className="text-[#FF5252]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-
               {/* Difficulty */}
               <FormField
                 control={form.control}
@@ -228,9 +273,9 @@ const CreateEventForm = () => {
                       <FormControl>
                         <SelectTrigger
                           className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 
-                          text-[#E0F2F1] focus:ring-2 focus:ring-[#4CAF50]/50"
+                            text-[#E0F2F1] focus:ring-2 focus:ring-[#4CAF50]/50"
                         >
-                          <SelectValue placeholder="Select difficulty" />
+                          <SelectValue placeholder="Select Difficulty" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
@@ -243,13 +288,12 @@ const CreateEventForm = () => {
                         )}
                       </SelectContent>
                     </Select>
-                    <FormMessage className="text-[#FF5252]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Description */}
             <FormField
               control={form.control}
               name="description"
@@ -258,17 +302,16 @@ const CreateEventForm = () => {
                   <FormLabel className="text-[#B0BEC5]">Description</FormLabel>
                   <FormControl>
                     <Input
+                      placeholder="Event Description"
                       {...field}
-                      placeholder="Enter event description"
                       className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
-                      focus:ring-2 focus:ring-[#4CAF50]/50"
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#FF5252]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
-
             {/* Date and Time */}
             <div className="grid md:grid-cols-2 gap-6">
               <FormField
@@ -276,7 +319,7 @@ const CreateEventForm = () => {
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#B0BEC5]">Event Date</FormLabel>
+                    <FormLabel className="text-[#B0BEC5]">Date</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
@@ -285,7 +328,7 @@ const CreateEventForm = () => {
                         focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage className="text-[#FF5252]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -295,7 +338,7 @@ const CreateEventForm = () => {
                 name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#B0BEC5]">Event Time</FormLabel>
+                    <FormLabel className="text-[#B0BEC5]">Time</FormLabel>
                     <FormControl>
                       <Input
                         type="time"
@@ -304,13 +347,12 @@ const CreateEventForm = () => {
                         focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage className="text-[#FF5252]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Location */}
             <FormField
               control={form.control}
               name="location.address"
@@ -319,17 +361,17 @@ const CreateEventForm = () => {
                   <FormLabel className="text-[#B0BEC5]">Address</FormLabel>
                   <FormControl>
                     <Input
+                      placeholder="Address"
                       {...field}
-                      placeholder="Enter event address"
                       className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
-                      focus:ring-2 focus:ring-[#4CAF50]/50"
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#FF5252]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
-
+            {/* Date and Time */}
             <div className="grid md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -339,13 +381,13 @@ const CreateEventForm = () => {
                     <FormLabel className="text-[#B0BEC5]">City</FormLabel>
                     <FormControl>
                       <Input
+                        placeholder="City"
                         {...field}
-                        placeholder="Enter city"
                         className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
                         focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage className="text-[#FF5252]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -355,24 +397,21 @@ const CreateEventForm = () => {
                 name="location.state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#B0BEC5]">
-                      State (optional)
-                    </FormLabel>
+                    <FormLabel className="text-[#B0BEC5]">State</FormLabel>
                     <FormControl>
                       <Input
+                        placeholder="State"
                         {...field}
-                        placeholder="Enter state"
                         className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
                         focus:ring-2 focus:ring-[#4CAF50]/50"
                       />
                     </FormControl>
-                    <FormMessage className="text-[#FF5252]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Max Participants */}
             <FormField
               control={form.control}
               name="maxParticipants"
@@ -385,47 +424,45 @@ const CreateEventForm = () => {
                     <Input
                       type="number"
                       {...field}
-                      placeholder="Enter max participants"
                       className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
-                      focus:ring-2 focus:ring-[#4CAF50]/50"
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#FF5252]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Registration Fee */}
             <FormField
               control={form.control}
               name="registrationFee"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-[#B0BEC5]">
-                    Registration Fee (optional)
+                    Registration Fee
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       {...field}
-                      placeholder="Enter registration fee"
                       className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
-                      focus:ring-2 focus:ring-[#4CAF50]/50"
+                        focus:ring-2 focus:ring-[#4CAF50]/50"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#FF5252]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#4CAF50] text-[#E0F2F1] hover:bg-[#388E3C] transition duration-200"
-            >
-              {isLoading ? "Creating..." : "Create Event"}
-            </Button>
+            <div className="flex justify-end mt-6">
+              <Button
+                type="submit"
+                className="w-full bg-[#4CAF50] text-[#E0F2F1] hover:bg-[#388E3C] transition duration-200"
+                disabled={isLoading}
+              >
+                {isLoading ? "Updating..." : "Update Event"}
+              </Button>
+            </div>
           </form>
         </Form>
       </div>
@@ -433,4 +470,4 @@ const CreateEventForm = () => {
   );
 };
 
-export default CreateEventForm;
+export default EditEventForm;
