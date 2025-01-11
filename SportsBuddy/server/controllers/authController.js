@@ -83,11 +83,23 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.cookie("SportsBuddyToken", token, {
+    // Adjust cookie settings based on environment
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    };
+
+    // If in production, ensure cross-site cookies work
+    if (process.env.NODE_ENV === "production") {
+      res.cookie("SportsBuddyToken", token, {
+        ...cookieOptions,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+    } else {
+      res.cookie("SportsBuddyToken", token, cookieOptions);
+    }
 
     res.status(200).json({
       success: true,
@@ -110,11 +122,22 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.clearCookie("SportsBuddyToken", {
+    // Adjust cookie clearing for production
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    };
+
+    // If in production, ensure cross-site cookies work
+    if (process.env.NODE_ENV === "production") {
+      res.clearCookie("SportsBuddyToken", {
+        ...cookieOptions,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+    } else {
+      res.clearCookie("SportsBuddyToken", cookieOptions);
+    }
 
     res.status(200).json({
       success: true,

@@ -159,15 +159,13 @@ export const participateInEvent = async (req, res) => {
       });
     }
 
-    // Check if event is full
     if (event.participants.length >= event.maxParticipants) {
       return res.status(400).json({
         success: false,
         message: "Event has reached maximum participants",
       });
     }
-
-    // Check if user is already participating
+    
     const isParticipating = event.participants.some(
       (participant) => participant.toString() === req.user._id.toString()
     );
@@ -178,19 +176,9 @@ export const participateInEvent = async (req, res) => {
         message: "You are already participating in this event",
       });
     }
-
-    // Add user to participants
     event.participants.push(req.user._id);
 
-    // IMPORTANT: Preserve the original createdBy if it exists
-    if (!event.createdBy) {
-      event.createdBy = req.user._id;
-    }
-
-    await event.save({
-      // Disable validation to skip required checks during save
-      validateBeforeSave: false 
-    });
+    await event.save();
 
     res.status(200).json({
       success: true,
@@ -218,7 +206,6 @@ export const leaveEvent = async (req, res) => {
       });
     }
 
-    // Remove user from participants
     event.participants = event.participants.filter(
       (participant) => participant.toString() !== req.user._id.toString()
     );

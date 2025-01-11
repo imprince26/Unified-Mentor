@@ -69,14 +69,14 @@ export const EventProvider = ({ children }) => {
     try {
       const response = await api.get(`/events/${eventId}`);
       if (!response.data.data) {
-        return null; 
+        return null;
       }
       return response.data.data;
     } catch (error) {
       if (error.response && error.response.status === 404) {
         return null;
       } else {
-        throw error; 
+        throw error;
       }
     }
   };
@@ -89,34 +89,34 @@ export const EventProvider = ({ children }) => {
       throw error;
     }
   }, []);
-const participateInEvent = async (eventId) => {
+  const participateInEvent = async (eventId) => {
     try {
       const response = await api.post(`/events/${eventId}/participate`);
-      
-      setEvents(prev => 
-        prev.map(event => 
+
+      setEvents((prev) =>
+        prev.map((event) =>
           event._id === eventId ? response.data.data : event
-        ) 
+        )
       );
-  
+
       return response.data;
     } catch (error) {
       console.error("Error participating in event", error);
       throw error;
     }
   };
-  
+
   const leaveEvent = async (eventId) => {
     try {
       const response = await api.delete(`/events/${eventId}/leave`);
-      
+
       // Update local events state
-      setEvents(prev => 
-        prev.map(event => 
+      setEvents((prev) =>
+        prev.map((event) =>
           event._id === eventId ? response.data.data : event
         )
       );
-  
+
       return response.data;
     } catch (error) {
       console.error("Error leaving event", error);
