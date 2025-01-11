@@ -65,7 +65,7 @@ const eventSchema = z.object({
     .number()
     .int("Must be a whole number")
     .min(1, "At least 1 participant required")
-    .max(100, "Maximum 100 participants allowed"),
+    .max(1000, "Maximum 1000 participants allowed"),
   difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]),
   registrationFee: z.coerce.number().min(0, "Fee cannot be negative").optional(),
 });

@@ -1,4 +1,7 @@
 SportsBuddy/server/node_modules
 SportsBuddy/server/.env
+SportsBuddy/server/data.js
+SportsBuddy/server/user.js
+
 SportsBuddy/client/node_modules
 SportsBuddy/client/.env

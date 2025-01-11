@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { formatDate, formatTime } from "@/utils/formatters";
 import { useEvents } from "@/context/EventContext";
+import toast from "react-hot-toast";
 
 const UserEventsList = ({ events, loading }) => {
   const navigate = useNavigate();
@@ -17,8 +18,21 @@ const UserEventsList = ({ events, loading }) => {
   const handleDelete = async (eventId) => {
     try {
       await deleteEvent(eventId);
+      toast.success("Event deleted successfully!", {
+        style: {
+          background: "#0F2C2C",
+          color: "#E0F2F1",
+        },
+      });
+
     } catch (error) {
-      console.error("Error deleting event", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete event";
+      toast.error(errorMessage, {
+        style: {
+          background: "#2C3E50",
+          color: "#ECF0F1",
+        },
+      });
     }finally {
       window.location.reload();
     }

@@ -100,7 +100,6 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
-    // If in production, ensure cross-site cookies work
     if (process.env.NODE_ENV === "production") {
       res.cookie("SportsBuddyToken", token, {
         ...cookieOptions,
@@ -131,14 +130,12 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    // Adjust cookie clearing for production
     const cookieOptions = {
       httpOnly: true,
       secure: true,
       sameSite: "None"
     };
 
-    // If in production, ensure cross-site cookies work
     if (process.env.NODE_ENV === "production") {
       res.clearCookie("SportsBuddyToken", {
         ...cookieOptions,
