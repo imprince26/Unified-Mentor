@@ -15,6 +15,8 @@ import eventRoute from "./routes/eventRoute.js";
 app.use(cors({
   origin:process.env.CLIENT_URL,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.set('trust proxy', 1);
 app.use(express.json());

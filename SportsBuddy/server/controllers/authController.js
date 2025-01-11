@@ -34,11 +34,22 @@ export const register = async (req, res) => {
 
     const token = generateToken(newUser);
 
-    res.cookie("SportsBuddyToken", token, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "None",
+      domain: process.env.COOKIE_DOMAIN,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    };
+
+    if (process.env.NODE_ENV === "production") {
+      res.cookie("SportsBuddyToken", token, {
+        ...cookieOptions,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+    } else {
+      res.cookie("SportsBuddyToken", token, cookieOptions);
+    }
 
     res.status(201).json({
       success: true,
@@ -83,11 +94,11 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    // Adjust cookie settings based on environment
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: true,
+      sameSite: "None",
+      domain: process.env.COOKIE_DOMAIN,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
@@ -157,19 +168,19 @@ export const getCurrentUser = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Not authenticated"
+        message: "Not authenticated",
       });
     }
 
     const user = await User.findById(req.user._id).select({
       password: 0,
-      __v: 0
+      __v: 0,
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found"
+        message: "User not found",
       });
     }
 
@@ -181,13 +192,13 @@ export const getCurrentUser = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-      }
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error fetching user details",
-      error: error.message
+      error: error.message,
     });
   }
 };
