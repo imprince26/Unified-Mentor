@@ -127,3 +127,22 @@ export const deleteEvent = async (req, res) => {
     });
   }
 };
+export const getUserEvents = async (req, res) => {
+  try {
+    const events = await Event.find({ 
+      createdBy: req.user._id 
+    }).sort({ createdAt: -1 }); // Sort by most recent first
+
+    res.status(200).json({
+      success: true,
+      count: events.length,
+      data: events
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user events",
+      error: error.message
+    });
+  }
+};

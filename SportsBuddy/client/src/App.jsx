@@ -12,6 +12,7 @@ import EventCreate from "./pages/EventCreate";
 import EventDetails from "./components/events/EventDetails";
 import SportsBuddyLoader from "./components/layout/Loader";
 import NotFound from "./pages/NotFound";
+import Dashboard from "./pages/Profile";
 // import UpdateEventForm from "./components/events/UpdateEventForm";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -74,6 +75,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/events/user/my-events" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />

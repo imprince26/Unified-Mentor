@@ -98,10 +98,12 @@ const Header = () => {
                 <div className="hidden"></div>
               ) : (
                 <div className="hidden md:flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <UserIcon className="h-5 w-5 text-[#4CAF50]" />
-                    <span className="text -[#E0F2F1]">{user.name}</span>
-                  </div>
+                  <Button onClick={() => navigate("/events/user/my-events")} className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2">
+                    <UserIcon className="h-6 w-6 text-[#4CAF50]" />
+                    <span className="text-[#E0F2F1] font-semibold">
+                    {user ? user.name : "Guest"}
+                  </span>
+                  </Button>
                   <Button
                     variant="ghost"
                     className="text-[#FF5252] hover:bg-[#FF5252]/10 hover:text-[#FF5252]/80"
@@ -161,12 +163,12 @@ const Header = () => {
             >
               {/* Sidebar Header */}
               <div className="flex justify-between items-center p-4 border-b border-[#2E7D32]/20">
-                <div className="flex items-center space-x-2">
-                  <UserIcon className="h-6 w-6 text-[#4CAF50]" />
-                  <span className="text-[#E0F2F1] font-semibold">
+              <Button onClick={() => navigate("/events/user/my-events")} className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2">
+                    <UserIcon className="h-6 w-6 text-[#4CAF50]" />
+                    <span className="text-[#E0F2F1] font-semibold">
                     {user ? user.name : "Guest"}
                   </span>
-                </div>
+                  </Button>
                 <Button
                   variant="ghost"
                   className="hover:bg-[#FF5252]/10"

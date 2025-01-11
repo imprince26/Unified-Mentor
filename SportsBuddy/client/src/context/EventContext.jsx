@@ -80,6 +80,15 @@ export const EventProvider = ({ children }) => {
       }
     }
   };
+  const getUserEvents = useCallback(async () => {
+    try {
+      const response = await api.get("/events/user/my-events");
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching user events", error);
+      throw error;
+    }
+  }, []);
   const contextValue = {
     events,
     selectedEvent,
@@ -88,6 +97,7 @@ export const EventProvider = ({ children }) => {
     createEvent,
     updateEvent,
     deleteEvent,
+    getUserEvents,
     getEventById,
     setSelectedEvent,
   };
