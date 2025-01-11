@@ -38,7 +38,6 @@ export const register = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      domain: process.env.COOKIE_DOMAIN,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
@@ -98,7 +97,6 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      domain: process.env.COOKIE_DOMAIN,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
@@ -136,8 +134,8 @@ export const logout = (req, res) => {
     // Adjust cookie clearing for production
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: true,
+      sameSite: "None"
     };
 
     // If in production, ensure cross-site cookies work
