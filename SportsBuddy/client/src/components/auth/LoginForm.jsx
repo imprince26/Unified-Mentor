@@ -14,9 +14,7 @@ import { Mail, Lock, ArrowRight, EyeIcon, EyeOffIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import api, { handleApiError } from "@/utils/api";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 
 const loginSchema = z.object({
@@ -54,7 +52,7 @@ const LoginForm = () => {
     try {
       const response = await login(data);
     } catch (error) {
-      const errorMessage = handleApiError(error);
+      console.error("Error logging in:", error);
     } finally {
       setIsLoading(false);
     }

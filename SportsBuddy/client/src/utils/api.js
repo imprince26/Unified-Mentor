@@ -7,9 +7,4 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export const handleApiError = (error) => {
-  console.error('API Error:', error);
-  return error.response?.data || { message: 'An error occurred' };
-};
-
 export default api;

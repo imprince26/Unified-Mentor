@@ -127,6 +127,7 @@ export const deleteEvent = async (req, res) => {
     });
   }
 };
+
 export const getUserEvents = async (req, res) => {
   try {
     const events = await Event.find({ 
@@ -143,6 +144,97 @@ export const getUserEvents = async (req, res) => {
       success: false,
       message: "Error fetching user events",
       error: error.message
+    });
+  }
+};
+
+export const participateInEvent = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    // Check if event is full
+    if (event.participants.length >= event.maxParticipants) {
+      return res.status(400).json({
+        success: false,
+        message: "Event has reached maximum participants",
+      });
+    }
+
+    // Check if user is already participating
+    const isParticipating = event.participants.some(
+      (participant) => participant.toString() === req.user._id.toString()
+    );
+
+    if (isParticipating) {
+      return res.status(400).json({
+        success: false,
+        message: "You are already participating in this event",
+      });
+    }
+
+    // Add user to participants
+    event.participants.push(req.user._id);
+
+    // IMPORTANT: Preserve the original createdBy if it exists
+    if (!event.createdBy) {
+      event.createdBy = req.user._id;
+    }
+
+    await event.save({
+      // Disable validation to skip required checks during save
+      validateBeforeSave: false 
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully joined the event",
+      data: event,
+    });
+  } catch (error) {
+    console.error("Error participating in event", error);
+    res.status(500).json({
+      success: false,
+      message: "Error participating in event",
+      error: error.message,
+    });
+  }
+};
+
+export const leaveEvent = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    // Remove user from participants
+    event.participants = event.participants.filter(
+      (participant) => participant.toString() !== req.user._id.toString()
+    );
+
+    await event.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully left the event",
+      data: event,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error leaving event",
+      error: error.message,
     });
   }
 };

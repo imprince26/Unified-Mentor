@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEvents } from "@/context/EventContext";
@@ -10,11 +10,11 @@ import {
   CalendarIcon,
   MapPinIcon,
   UsersIcon,
-  EditIcon,
-  TrashIcon,
   TagIcon,
   TrophyIcon,
   IndianRupee,
+  UserPlus,
+  UserMinus,
 } from "lucide-react";
 import { formatDate, formatTime, formatCurrency } from "@/utils/formatters";
 import { toast } from "react-hot-toast";
@@ -23,11 +23,10 @@ import SportsBuddyLoader from "../layout/Loader";
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getEventById, deleteEvent } = useEvents();
+  const { getEventById, participateInEvent, leaveEvent } = useEvents();
   const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [canModifyEvent, setCanModifyEvent] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -38,13 +37,8 @@ const EventDetails = () => {
           return;
         }
         setEvent(fetchedEvent);
-    
-        const isCreator = user?.id === fetchedEvent.createdBy;
-        const isAdmin = user?.role === "admin";
-    
-        setCanModifyEvent(isCreator || isAdmin);
       } catch (error) {
-        navigate("/"); 
+        navigate("/");
       } finally {
         setLoading(false);
       }
@@ -52,57 +46,61 @@ const EventDetails = () => {
     fetchEvent();
   }, [id, getEventById, navigate, user]);
 
-  const handleDeleteEvent = async () => {
-    if (!canModifyEvent) {
-      toast.error("You are not authorized to delete this event", {
+  const handleParticipate = async () => {
+    try {
+      await participateInEvent(id);
+      toast.success("Successfully joined the event!", {
+        style: {
+          background: "#0F2C2C",
+          color: "#E0F2F1",
+        },
+        icon: <UserPlus className="text-[#4CAF50]" />,
+      });
+      const updatedEvent = await getEventById(id);
+      setEvent(updatedEvent);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to join event", {
         style: {
           background: "#2C3E50",
           color: "#ECF0F1",
         },
       });
-      return;
     }
+  };
 
+  const handleLeaveEvent = async () => {
     try {
-      const confirmDelete = window.confirm(
-        "Are you sure you want to delete this event?"
-      );
-
-      if (confirmDelete) {
-        await deleteEvent(id);
-        toast.success("Event deleted successfully", {
+      const confirmLeave = window.confirm("Are you sure you want to leave?");
+      if (confirmLeave) {
+        await leaveEvent(id);
+        toast.success("Left the event successfully", {
           style: {
             background: "#0F2C2C",
             color: "#E0F2F1",
           },
+          icon: <UserMinus className="text-red-500" />,
         });
-        navigate("/");
+        // Refresh event details
+        const updatedEvent = await getEventById(id);
+        setEvent(updatedEvent);
       }
+      return null;
     } catch (error) {
-      toast.error("Failed to delete event", {
+      toast.error(error.response?.data?.message || "Failed to leave event", {
         style: {
           background: "#2C3E50",
           color: "#ECF0F1",
         },
       });
     }
-  };
-
-  const handleEditEvent = () => {
-    if (!canModifyEvent) {
-      toast.error("You are not authorized to edit this event", {
-        style: {
-          background: "#2C3E50",
-          color: "#ECF0F1",
-        },
-      });
-      return;
-    }
-    navigate(`/events/edit/${id}`);
   };
 
   if (loading) return <SportsBuddyLoader />;
   if (!event) return <div>Event not found</div>;
+
+  const isParticipating = event.participants.some(
+    (participant) => participant.toString() === user.id
+  );
 
   const difficultyColors = {
     Beginner: "bg-green-500/20 text-green-600 border-green-500",
@@ -121,15 +119,17 @@ const EventDetails = () => {
       >
         <div className="max-w-4xl mx-auto bg-[#0F2C2C]/70 rounded-2xl shadow-2xl overflow-hidden">
           {/* Event Header */}
-          <div className="bg-[#2E7D32]/20 p-6 border-b border-[#2E7D32]/30">
-            <h1 className="text-3xl font-bold text-[#4CAF50] mb-2">
-              {event.name}
-            </h1>
-            <div
-              className={`inline-block px-4 py-1 rounded-full text-sm font-semibold 
-              ${difficultyColors[event.difficulty]}`}
-            >
-              {event.difficulty} Level
+          <div className="bg-[#2E7D32]/20 p-6 border-b border-[#2E7D32]/30 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-[#4CAF50] mb-2">
+                {event.name}
+              </h1>
+              <div
+                className={`inline-block px-4 py-1 rounded-full text-sm font-semibold 
+                ${difficultyColors[event.difficulty]}`}
+              >
+                {event.difficulty} Level
+              </div>
             </div>
           </div>
 
@@ -152,8 +152,8 @@ const EventDetails = () => {
                 <div>
                   <p className="text-[#81C784]">Location</p>
                   <p className="font-semibold">
-                    {event.location.address}, {event.location.city}
-                    {event.location.state && `, ${event.location.state}`}
+                    {event.location.address}, {event.location.city},{" "}
+                    {event.location.state}
                   </p>
                 </div>
               </div>
@@ -163,7 +163,7 @@ const EventDetails = () => {
                 <div>
                   <p className="text-[#81C784]">Participants</p>
                   <p className="font-semibold">
-                    {event.participants.length} / {event.maxParticipants}
+                    {event.participants.length}/{event.maxParticipants}
                   </p>
                 </div>
               </div>
@@ -209,23 +209,27 @@ const EventDetails = () => {
             <p className="text-[#B2DFDB]">{event.description}</p>
           </div>
 
-          {/* Admin/Creator Actions */}
-          {canModifyEvent && (
-            <div className="p-6 flex justify-between border-t border-[#2E7D32]/30">
-              {/* <Button
-                onClick={handleEditEvent}
-                className="bg-blue-500 text-white hover:bg-blue-600"
-              >
-                <EditIcon className="mr-2" /> Edit Event
-              </Button> */}
+          {/* Participation Button */}
+          <div className="flex justify-center p-6">
+            {isParticipating ? (
               <Button
-                onClick={handleDeleteEvent}
-                className="bg-red-500 text-white hover:bg-red-600"
+                onClick={handleLeaveEvent}
+                className="bg-red-500 hover:bg-red-600 text-white"
               >
-                <TrashIcon className="mr-2" /> Delete Event
+                Leave Event
               </Button>
-            </div>
-          )}
+            ) : (
+              <Button
+                onClick={handleParticipate}
+                disabled={event.participants.length >= event.maxParticipants}
+                className="bg-[#4CAF50] hover:bg-[#388E3C] text-white"
+              >
+                {event.participants.length >= event.maxParticipants
+                  ? "Event Full"
+                  : "Participate"}
+              </Button>
+            )}
+          </div>
         </div>
       </motion.div>
 

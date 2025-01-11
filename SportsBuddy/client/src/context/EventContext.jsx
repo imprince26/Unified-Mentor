@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback } from "react";
+import { createContext, useState, useContext, useCallback } from "react";
 import api from "@/utils/api";
 
 const EventContext = createContext();
@@ -89,6 +89,40 @@ export const EventProvider = ({ children }) => {
       throw error;
     }
   }, []);
+const participateInEvent = async (eventId) => {
+    try {
+      const response = await api.post(`/events/${eventId}/participate`);
+      
+      setEvents(prev => 
+        prev.map(event => 
+          event._id === eventId ? response.data.data : event
+        ) 
+      );
+  
+      return response.data;
+    } catch (error) {
+      console.error("Error participating in event", error);
+      throw error;
+    }
+  };
+  
+  const leaveEvent = async (eventId) => {
+    try {
+      const response = await api.delete(`/events/${eventId}/leave`);
+      
+      // Update local events state
+      setEvents(prev => 
+        prev.map(event => 
+          event._id === eventId ? response.data.data : event
+        )
+      );
+  
+      return response.data;
+    } catch (error) {
+      console.error("Error leaving event", error);
+      throw error;
+    }
+  };
   const contextValue = {
     events,
     selectedEvent,
@@ -98,6 +132,8 @@ export const EventProvider = ({ children }) => {
     updateEvent,
     deleteEvent,
     getUserEvents,
+    participateInEvent,
+    leaveEvent,
     getEventById,
     setSelectedEvent,
   };

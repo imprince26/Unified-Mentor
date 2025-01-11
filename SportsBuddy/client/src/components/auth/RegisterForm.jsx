@@ -13,7 +13,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import api, { handleApiError } from "@/utils/api";
+import api from "@/utils/api";
 import { useNavigate } from "react-router-dom";
 import {
   User,
@@ -88,7 +88,7 @@ const RegisterForm = () => {
 
       navigate("/");
     } catch (error) {
-      const errorMessage = handleApiError(error);
+      const errorMessage = error.response.data;
       toast.error(errorMessage.message, {
         style: {
           background: "#2C3E50",
