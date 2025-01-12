@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import {
   MenuIcon,
@@ -100,10 +101,10 @@ const Header = () => {
                 <div className="hidden md:flex items-center space-x-4">
                   <Button
                     onClick={() => navigate("/events/user/my-events")}
-                    className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-2"
+                    className="flex items-center bg-transparent hover:bg-[#4CAF50]/10 space-x-1"
                   >
-                    <UserIcon className="h-6 w-6 text-[#4CAF50]" />
-                    <span className="text-[#E0F2F1] font-semibold">
+                    <UserIcon className="text-[#4CAF50]" />
+                    <span className="text-[#E0F2F1] text-sm font-semibold">
                       {user ? user.name : "Guest"}
                     </span>
                   </Button>

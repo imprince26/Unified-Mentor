@@ -121,7 +121,7 @@ const Events = () => {
       >
         {/* Page Header */}
         <motion.div
-          initial={{ opacity: 0, y: -50 }}
+          initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
@@ -138,6 +138,7 @@ const Events = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           className="mb-12 grid md:grid-cols-3 gap-6 items-center"
         >
           {/* Search Input */}

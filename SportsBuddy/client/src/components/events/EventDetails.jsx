@@ -151,7 +151,7 @@ const EventDetails = () => {
       >
         <div className="max-w-4xl mx-auto bg-[#0F2C2C]/70 rounded-2xl shadow-2xl overflow-hidden">
           {/* Event Header */}
-          <div className="bg-[#2E7D32]/20 p-6 border-b border-[#2E7D32]/30 flex justify-between items-center">
+          <div className="bg-[#2E7D32]/20 p-6 border-b border-[#2E7D32]/30 ">
             <div className="w-full md:flex md:flex-row flex-col md:justify-between justify-center items-center">
               <div className="">
               <h1 className="text-3xl font-bold text-[#4CAF50] mb-2">
@@ -165,8 +165,8 @@ const EventDetails = () => {
               </div>
               </div>
                 {/* Author actions */}
-          {isAuthorized && (
-            <div className="flex justify-center  ">
+            {isAuthorized && (
+            <div className="flex  justify-start mt-4 lg:mt-1  ">
             <Button
                 onClick={() => navigate(`/events/edit/${event._id}`)}
                 className="bg-[#4CAF50] hover:bg-[#388E3C] mr-4 "
