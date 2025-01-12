@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useCallback } from "react";
 import api from "@/utils/api";
+import { redirect } from "react-router-dom";
 
 const EventContext = createContext();
 

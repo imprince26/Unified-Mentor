@@ -54,7 +54,6 @@ const EventDetails = () => {
     };
     fetchEvent();
   }, [id, getEventById, navigate, user, setIsAuthorized]);
-  console.log(isAuthorized)
 
   const handleParticipate = async () => {
     try {
@@ -113,7 +112,6 @@ const EventDetails = () => {
             color: "#E0F2F1",
           },
         });
-  
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Failed to delete event";
         toast.error(errorMessage, {
@@ -122,8 +120,6 @@ const EventDetails = () => {
             color: "#ECF0F1",
           },
         });
-      }finally {
-        window.location.reload();
       }
     };
 
