@@ -127,22 +127,6 @@ export const AuthProvider = ({ children }) => {
       });
     }
   };
-  const findUserById = async (id) => {
-    try {
-      const response = await api.get(`/users/${id}`);
-
-      return response.data;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "User not found";
-
-      toast.error(errorMessage, {
-        style: {
-          background: "#2C3E50",
-          color: "#ECF0F1",
-        },
-      });
-    }
-  };
 
   const contextValue = {
     user,
@@ -151,7 +135,6 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    findUserById,
     checkUserAuthentication,
   };
 
