@@ -137,6 +137,7 @@ const RegisterForm = () => {
                 <FormLabel
                   className={`text-[#B0BEC5] transition-all duration-300 
                       ${inputStates.name.isFocused ? "text-[#4CAF50]" : ""}`}
+                  htmlFor="name"
                 >
                   Full Name
                 </FormLabel>
@@ -199,6 +200,7 @@ const RegisterForm = () => {
                       ${
                         inputStates.username.isFocused ? "text-[#4CAF50]" : ""
                       }`}
+                  htmlFor="username"
                 >
                   Username
                 </FormLabel>
@@ -259,6 +261,7 @@ const RegisterForm = () => {
                 <FormLabel
                   className={`text-[#B0BEC5] transition-all duration-300 
                       ${inputStates.email.isFocused ? "text-[#4CAF50]" : ""}`}
+                  htmlFor="email"
                 >
                   Email Address
                 </FormLabel>
@@ -321,6 +324,7 @@ const RegisterForm = () => {
                       ${
                         inputStates.password.isFocused ? "text-[#4CAF50]" : ""
                       }`}
+                  htmlFor="password"
                 >
                   Password
                 </FormLabel>

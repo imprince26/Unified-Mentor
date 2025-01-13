@@ -10,7 +10,6 @@ import {
 import { CalendarIcon, UsersIcon, TrendingUpIcon } from "lucide-react";
 
 const UserStatistics = ({ events }) => {
-  // Calculate statistics
   const totalEvents = events.length;
   const upcomingEvents = events.filter(
     (event) => new Date(event.date) > new Date()
@@ -62,7 +61,7 @@ const UserStatistics = ({ events }) => {
         </div>
 
         {/* Participation Rate Card */}
-        <div className="bg-[#1D4E4E]/30 p-6 rounded-lg">
+        <div className="bg-[#1D4E4E]/30  p-6 rounded-lg">
           <div className="flex items-center space-x-4">
             <div className="bg-[#4CAF50]/20 p-3 rounded-full">
               <UsersIcon className="h-6 w-6 text-[#4CAF50]" />
@@ -82,9 +81,9 @@ const UserStatistics = ({ events }) => {
         <h3 className="text-xl font-semibold text-[#81C784] mb-4">
           Event Statistics Overview
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
-            <XAxis dataKey="name" stroke="#81C784" tick={{ fill: "#81C784" }} />
+        <ResponsiveContainer width="100%" height={300} >
+          <BarChart data={chartData} >
+            <XAxis dataKey="name"  stroke="#81C784"  tick={{ fill: "#81C784" }} />
             <YAxis stroke="#81C784" tick={{ fill: "#81C784" }} />
             <Tooltip
               contentStyle={{

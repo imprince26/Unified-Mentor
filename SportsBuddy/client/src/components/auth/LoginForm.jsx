@@ -94,6 +94,7 @@ const LoginForm = () => {
                 <FormLabel
                   className={`text-[#B0BEC5] transition-all duration-300 
                       ${inputStates.email.isFocused ? "text-[#4CAF50]" : ""}`}
+                  htmlFor="email"
                 >
                   Email Address
                 </FormLabel>
@@ -155,6 +156,7 @@ const LoginForm = () => {
                       ${
                         inputStates.password.isFocused ? "text-[#4CAF50]" : ""
                       }`}
+                  htmlFor="password"
                 >
                   Password
                 </FormLabel>
@@ -239,7 +241,7 @@ const LoginForm = () => {
 
       <div className="mt-6 text-center">
         <p className="text-sm text-[#B0BEC5]">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Button
             variant="link"
             className="text-[#4CAF50] hover:text-[#388E3C]"
