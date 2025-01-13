@@ -41,10 +41,9 @@ const UserEventsList = ({ events, loading, onRefresh }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [eventsPerPage] = useState(6);
 
-  // State for delete confirmation
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     isOpen: false,
-    event: null, // Change to store the entire event object
+    event: null,
   });
 
   // Categories for filtering
@@ -334,9 +333,7 @@ const UserEventsList = ({ events, loading, onRefresh }) => {
               Are you sure you want to delete the event &quot;
               {deleteConfirmation.event?.name}&quot;?
             </p>
-            <div
-              className="flex justify-end mt-4"
-            >
+            <div className="flex justify-end mt-4">
               <Button
                 onClick={handleDelete}
                 className="bg-red-600 hover:bg-red-700"

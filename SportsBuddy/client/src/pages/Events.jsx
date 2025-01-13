@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
 import { useAuth } from "@/context/AuthContext";
 
-// Component Imports
+
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import EventCard from "@/components/events/EventCard";
 
-// UI Components
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,12 +21,14 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Icons
+
 import {
   PlusIcon,
   SearchIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  FilterIcon,
+  CalendarIcon,
 } from "lucide-react";
 
 const EventSkeleton = () => (
@@ -42,8 +44,9 @@ const Events = () => {
   const { events, fetchEvents, loading } = useEvents();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("ALL_CATEGORIES");
-  const [difficultyFilter, setDifficultyFilter] = useState("ALL_LEVELS");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 6;
 
@@ -51,7 +54,9 @@ const Events = () => {
     fetchEvents();
   }, [fetchEvents]);
 
+  // Categories for filtering
   const categories = [
+    "ALL",
     "Football",
     "Basketball",
     "Tennis",
@@ -63,10 +68,9 @@ const Events = () => {
     "Other",
   ];
 
-  const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
-
-  const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
+  // Filtering and Sorting Logic
+  const filteredAndSortedEvents = useMemo(() => {
+    let result = events.filter((event) => {
       // Search filter
       const matchesSearch = event.name
         .toLowerCase()
@@ -74,27 +78,42 @@ const Events = () => {
 
       // Category filter
       const matchesCategory =
-        categoryFilter === "ALL_CATEGORIES" ||
-        event.category === categoryFilter;
+        categoryFilter === "ALL" || event.category === categoryFilter;
 
-      // Difficulty filter
-      const matchesDifficulty =
-        difficultyFilter === "ALL_LEVELS" ||
-        event.difficulty === difficultyFilter;
-
-      return matchesSearch && matchesCategory && matchesDifficulty;
+      return matchesSearch && matchesCategory;
     });
-  }, [events, searchTerm, categoryFilter, difficultyFilter]);
+
+    // Sorting
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "date":
+          comparison = new Date(a.date) - new Date(b.date);
+          break;
+        case "category":
+          comparison = a.category.localeCompare(b.category);
+          break;
+        default:
+          comparison = 0;
+      }
+      return sortOrder === "desc" ? -comparison : comparison;
+    });
+
+    return result;
+  }, [events, searchTerm, categoryFilter, sortBy, sortOrder]);
 
   // Pagination Logic
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = filteredEvents.slice(
+  const currentEvents = filteredAndSortedEvents.slice(
     indexOfFirstEvent,
     indexOfLastEvent
   );
 
-  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedEvents.length / eventsPerPage);
 
   // Pagination Handlers
   const handleNextPage = () => {
@@ -108,7 +127,7 @@ const Events = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, categoryFilter, difficultyFilter]);
+  }, [searchTerm, categoryFilter, sortBy, sortOrder]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A1A1A] via-[#0F2C2C] to-[#0A1A1A] text-[#E0F2F1] relative">
@@ -153,48 +172,47 @@ const Events = () => {
           </div>
 
           {/* Category Filter */}
-          <div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
-                <SelectValue placeholder="Select Category">
-                  {categoryFilter === "ALL_CATEGORIES"
-                    ? "All Categories"
-                    : categoryFilter}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
-                <SelectItem value="ALL_CATEGORIES">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
+              <SelectValue placeholder="Select Category">
+                {categoryFilter === "ALL" ? "All Categories" : categoryFilter}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          {/* Difficulty Filter */}
-          <div>
-            <Select
-              value={difficultyFilter}
-              onValueChange={setDifficultyFilter}
-            >
+          {/* Sort Dropdown */}
+          <div className="flex space-x-2">
+            <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1]">
-                <SelectValue placeholder="Select Difficulty">
-                  {difficultyFilter === "ALL_LEVELS"
-                    ? "All Levels"
-                    : difficultyFilter}
+                <SelectValue placeholder="Sort By">
+                  {sortBy === "date"
+                    ? "Date"
+                    : sortBy === "name"
+                    ? "Name"
+                    : "Category"}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
-                <SelectItem value="ALL_LEVELS">All Levels</SelectItem>
-                {difficultyLevels.map((level) => (
-                  <SelectItem key={level} value={level}>
-                    {level}
-                  </SelectItem>
-                ))}
+                <SelectItem value="date">Date</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
               </SelectContent>
             </Select>
+            <Button
+              onClick={() =>
+                setSortOrder(sortOrder === " asc" ? "desc" : "asc")
+              }
+              className="bg-[#1D4E4E]/30 hover:bg-[#1D4E4E]/60 border-[#2E7D32]/30 text-[#E0F2F1]"
+            >
+              <FilterIcon />
+            </Button>
           </div>
         </motion.div>
 
@@ -205,8 +223,21 @@ const Events = () => {
               <EventSkeleton key={index} />
             ))
           ) : currentEvents.length === 0 ? (
-            <div className="text-center h-20 w-[100vw] text-[#81C784]">
-              <p className="text-2xl font-semibold">No events found.</p>
+            <div className="text-center lg:col-span-3 md:col-span-2 col-span-1 py-12 bg-[#1D4E4E]/30 rounded-lg">
+              <CalendarIcon
+                className="mx-auto mb-4 text-[#4CAF50] opacity-50"
+                size={64}
+              />
+              <p className="text-[#81C784] text-xl mb-6">
+                No events found matching your search criteria
+              </p>
+              <Button
+                onClick={() => setSearchTerm("")}
+                className="bg-[#4CAF50] hover:bg-[#388E3C] group"
+              >
+                <FilterIcon className="mr-2 group-hover:rotate-180 transition-transform" />
+                Clear Search
+              </Button>
             </div>
           ) : (
             currentEvents.map((event) => (
@@ -225,8 +256,8 @@ const Events = () => {
             <ChevronLeftIcon className="mr-2" /> Previous
           </Button>
           <span>
-          Page {currentPage} of {totalPages}
-        </span>
+            Page {currentPage} of {totalPages}
+          </span>
           <Button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
