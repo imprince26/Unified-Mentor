@@ -326,7 +326,7 @@ const UserEventsList = ({ events, loading, onRefresh }) => {
             setDeleteConfirmation({ isOpen: false, event: null })
           }
         >
-          <DialogContent className="bg-[#1D4E4E] border-[#2E7D32]/30 text-[#E0F2F1]">
+          <DialogContent className="bg-[#1D4E4E] border-[#2E7D32]/30 rounded-xl text-[#E0F2F1]">
             <DialogHeader>
               <DialogTitle>Confirm Deletion</DialogTitle>
             </DialogHeader>

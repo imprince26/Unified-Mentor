@@ -224,6 +224,9 @@ const Events = () => {
           >
             <ChevronLeftIcon className="mr-2" /> Previous
           </Button>
+          <span>
+          Page {currentPage} of {totalPages}
+        </span>
           <Button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
