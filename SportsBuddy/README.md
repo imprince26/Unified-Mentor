@@ -6,7 +6,7 @@
 ---
 
 ## 🚀 **Live Demo**
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Open-green?style=for-the-badge&logo=vercel)](https://example.com/sportsbuddy)  
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open-red?style=for-the-badge&logo=vercel)]([https://example.com/sportsbuddy](https://sports-buddy-nine.vercel.app/))  
 
 ---
 
