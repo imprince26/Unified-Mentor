@@ -282,7 +282,7 @@ const CreateEventForm = () => {
                         type="date"
                         {...field}
                         className="bg-[#1D4E4E]/30 border-[#2E7D32]/30 text-[#E0F2F1] 
-                        focus:ring-2 focus:ring-[#4CAF50]/50"
+                        focus:ring-2 focus:ring-[#4CAF50]/50 "
                       />
                     </FormControl>
                     <FormMessage className="text-[#FF5252]" />
