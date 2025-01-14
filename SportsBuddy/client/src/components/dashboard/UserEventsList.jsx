@@ -154,7 +154,7 @@ const UserEventsList = ({ events, loading, onRefresh }) => {
   const openDeleteConfirmation = (event) => {
     setDeleteConfirmation({
       isOpen: true,
-      event: event, // Store the entire event object
+      event: event,
     });
   };
 
