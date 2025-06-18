@@ -98,7 +98,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     };
 
     if (process.env.NODE_ENV === "production") {
@@ -134,7 +134,7 @@ export const logout = (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: true,
-      sameSite: "None"
+      sameSite: "None",
     };
 
     if (process.env.NODE_ENV === "production") {

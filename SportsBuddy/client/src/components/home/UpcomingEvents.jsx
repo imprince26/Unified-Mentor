@@ -34,7 +34,7 @@ const UpcomingEvents = () => {
     if (events.length === 0) {
       fetchEvents();
     }
-  }, [fetchEvents, events.length]);
+  }, [fetchEvents]);
 
   useEffect(() => {
     if (events.length > 0) {
@@ -133,13 +133,15 @@ const UpcomingEvents = () => {
 
       {/* Events Grid */}
       <div className="grid md:grid-cols-3 gap-8 relative z-10">
-        {loading ? (
-          <>
-            <EventCardSkeleton />
-            <EventCardSkeleton />
-            <EventCardSkeleton />
-          </>
-        ) : upcomingEvents.length > 0 ? (
+        {
+        // loading ? (
+        //   <>
+        //     <EventCardSkeleton />
+        //     <EventCardSkeleton />
+        //     <EventCardSkeleton />
+        //   </>
+        // ) : 
+        upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
             <motion.div
               key={event._id}
